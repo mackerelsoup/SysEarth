@@ -1,0 +1,87 @@
+{
+ "hansen": {
+  "lossyear": "data/clipped/Hansen_GFC-2025-v1.13_lossyear_10N_090E_clip.tif",
+  "treecover2000": "data/clipped/Hansen_GFC-2025-v1.13_treecover2000_10N_090E_clip.tif",
+  "datamask": "data/clipped/Hansen_GFC-2025-v1.13_datamask_10N_090E_clip.tif"
+ },
+ "hansen_unused": {
+  "gain": "data/clipped/Hansen_GFC-2025-v1.13_gain_10N_090E_clip.tif"
+ },
+ "forest2020": {
+  "path": "data/layers/glad_glclu2020_v2_hansengrid.tif",
+  "values": [
+   27,
+   28,
+   29,
+   30,
+   31,
+   32,
+   33,
+   34,
+   35,
+   36,
+   37,
+   38,
+   39,
+   40,
+   41,
+   42,
+   43,
+   44,
+   45,
+   46,
+   47,
+   48,
+   127,
+   128,
+   129,
+   130,
+   131,
+   132,
+   133,
+   134,
+   135,
+   136,
+   137,
+   138,
+   139,
+   140,
+   141,
+   142,
+   143,
+   144,
+   145,
+   146,
+   147,
+   148
+  ],
+  "note": "GLAD GLCLU 2020 v2: tree cover with height >=5 m (dry 27-48, wetland 127-148)"
+ },
+ "plantation": {
+  "path": "data/layers/glad_commodities2015_asia_hansengrid.tif",
+  "values": [
+   2,
+   4
+  ],
+  "note": "GLAD commodities 2015 (pre cut-off): 2 plantation other (incl. rubber), 4 oil palm"
+ },
+ "height": {
+  "path": "data/layers/glad_tch2020_hansengrid.tif",
+  "min": 5
+ },
+ "strict_pa": {
+  "path": "data/layers/protected_areas_overture.geojson",
+  "field": "eudr_category",
+  "values": [
+   "strict"
+  ]
+ },
+ "restricted": {
+  "path": "tests/data/synthetic_restricted_areas.geojson",
+  "field": "eudr_category",
+  "values": [
+   "restricted"
+  ],
+  "synthetic": true
+ }
+}

@@ -82,7 +82,7 @@ def main():
     hansen_all = {k: size(v) for k, v in cfg["hansen"].items()}
     gain = cfg.get("hansen_unused", {})
     anc = {k: size(cfg[k]["path"]) for k in ("forest2020", "plantation", "height") if cfg.get(k)}
-    anc_native = {k: size(cfg[k].get("native")) for k in ("forest2020", "plantation", "height") if cfg.get(k)}
+    anc_native = {k: size(cfg[k].get("native", cfg[k]["path"])) for k in ("forest2020", "plantation", "height") if cfg.get(k)}
     vec = {k: size(cfg[k]["path"]) for k in ("strict_pa", "restricted") if cfg.get(k)}
     vec_unique = sum(set(vec.values())) if vec else 0
     cube_v = size(cd / "strict_pa.geojson") + size(cd / "restricted.geojson")

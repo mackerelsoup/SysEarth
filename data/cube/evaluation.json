@@ -1,0 +1,798 @@
+{
+ "storage": {
+  "pixels": 2520066,
+  "hansen_used_bytes": {
+   "lossyear": 577418,
+   "treecover2000": 1430774,
+   "datamask": 8276
+  },
+  "hansen_dropped_bytes": {
+   "gain": 141758
+  },
+  "ancillary_on_grid_bytes": {
+   "forest2020": 1159566,
+   "plantation": 374129,
+   "height": 1051611
+  },
+  "ancillary_native_bytes": {
+   "forest2020": 1159566,
+   "plantation": 374129,
+   "height": 1051611
+  },
+  "pa_vector_bytes": {
+   "strict_pa": 38036,
+   "restricted": 3847
+  },
+  "original_total_bytes": 4785415,
+  "original_needed_bytes": 4643657,
+  "original_native_total_bytes": 4785415,
+  "original_uncompressed_bytes": 17640462,
+  "cube_bytes": 1233486,
+  "cube_uncompressed_bytes": 5040132,
+  "overview_bytes": 6464,
+  "decision_byte_bytes": 238992,
+  "cube_vectors_bytes": 41765,
+  "reduction_vs_original_needed": 3.64,
+  "reduction_vs_original_total": 3.75,
+  "reduction_vs_native_total": 3.75,
+  "overview_extra_pct": 0.52
+ },
+ "decisions": {
+  "eudr": {
+   "cube": {
+    "plots": 1005,
+    "all_outputs_match_pct": 100.0,
+    "deforested_px_match_pct": 100.0,
+    "mismatches": []
+   },
+   "cube+overview": {
+    "plots": 1005,
+    "all_outputs_match_pct": 100.0,
+    "deforested_px_match_pct": 100.0,
+    "mismatches": []
+   },
+   "positives_original": {
+    "c2_indication": 238,
+    "d1_strict_pa": 101,
+    "d2_restricted": 178
+   },
+   "positives_by_kind": {
+    "real": {
+     "n": 17,
+     "c2_indication": 3,
+     "d1_strict_pa": 2,
+     "d2_restricted": 0
+    },
+    "random": {
+     "n": 600,
+     "c2_indication": 120,
+     "d1_strict_pa": 62,
+     "d2_restricted": 11
+    },
+    "post2020_loss": {
+     "n": 138,
+     "c2_indication": 62,
+     "d1_strict_pa": 6,
+     "d2_restricted": 2
+    },
+    "pa_boundary": {
+     "n": 250,
+     "c2_indication": 53,
+     "d1_strict_pa": 31,
+     "d2_restricted": 165
+    }
+   }
+  },
+  "eudr_hansen_only": {
+   "cube": {
+    "plots": 1005,
+    "all_outputs_match_pct": 100.0,
+    "deforested_px_match_pct": 100.0,
+    "mismatches": []
+   },
+   "cube+overview": {
+    "plots": 1005,
+    "all_outputs_match_pct": 100.0,
+    "deforested_px_match_pct": 100.0,
+    "mismatches": []
+   },
+   "positives_original": {
+    "c2_indication": 548,
+    "d1_strict_pa": 101,
+    "d2_restricted": 178
+   },
+   "positives_by_kind": {
+    "real": {
+     "n": 17,
+     "c2_indication": 7,
+     "d1_strict_pa": 2,
+     "d2_restricted": 0
+    },
+    "random": {
+     "n": 600,
+     "c2_indication": 298,
+     "d1_strict_pa": 62,
+     "d2_restricted": 11
+    },
+    "post2020_loss": {
+     "n": 138,
+     "c2_indication": 134,
+     "d1_strict_pa": 6,
+     "d2_restricted": 2
+    },
+    "pa_boundary": {
+     "n": 250,
+     "c2_indication": 109,
+     "d1_strict_pa": 31,
+     "d2_restricted": 165
+    }
+   }
+  },
+  "legacy": {
+   "cube": {
+    "plots": 1005,
+    "all_outputs_match_pct": 100.0,
+    "deforested_px_match_pct": 100.0,
+    "mismatches": []
+   },
+   "cube+overview": {
+    "plots": 1005,
+    "all_outputs_match_pct": 100.0,
+    "deforested_px_match_pct": 100.0,
+    "mismatches": []
+   },
+   "positives_original": {
+    "c2_indication": 407,
+    "d1_strict_pa": 101,
+    "d2_restricted": 178
+   },
+   "positives_by_kind": {
+    "real": {
+     "n": 17,
+     "c2_indication": 3,
+     "d1_strict_pa": 2,
+     "d2_restricted": 0
+    },
+    "random": {
+     "n": 600,
+     "c2_indication": 209,
+     "d1_strict_pa": 62,
+     "d2_restricted": 11
+    },
+    "post2020_loss": {
+     "n": 138,
+     "c2_indication": 105,
+     "d1_strict_pa": 6,
+     "d2_restricted": 2
+    },
+    "pa_boundary": {
+     "n": 250,
+     "c2_indication": 90,
+     "d1_strict_pa": 31,
+     "d2_restricted": 165
+    }
+   }
+  },
+  "rspo": {
+   "cube": {
+    "plots": 1005,
+    "all_outputs_match_pct": 100.0,
+    "deforested_px_match_pct": 100.0,
+    "mismatches": []
+   },
+   "cube+overview": {
+    "plots": 1005,
+    "all_outputs_match_pct": 100.0,
+    "deforested_px_match_pct": 100.0,
+    "mismatches": []
+   },
+   "positives_original": {
+    "c2_indication": 833,
+    "d1_strict_pa": 101,
+    "d2_restricted": 178
+   },
+   "positives_by_kind": {
+    "real": {
+     "n": 17,
+     "c2_indication": 14,
+     "d1_strict_pa": 2,
+     "d2_restricted": 0
+    },
+    "random": {
+     "n": 600,
+     "c2_indication": 478,
+     "d1_strict_pa": 62,
+     "d2_restricted": 11
+    },
+    "post2020_loss": {
+     "n": 138,
+     "c2_indication": 135,
+     "d1_strict_pa": 6,
+     "d2_restricted": 2
+    },
+    "pa_boundary": {
+     "n": 250,
+     "c2_indication": 206,
+     "d1_strict_pa": 31,
+     "d2_restricted": 165
+    }
+   }
+  }
+ },
+ "query": {
+  "eudr": {
+   "original": {
+    "median_ms_per_plot": 1.087,
+    "mean_ms_per_plot": 1.15,
+    "window_reads": 5025,
+    "pixels_decoded": 1188450,
+    "plots_answered_from_overview": 0,
+    "cog_range_requests": 5490
+   },
+   "cube": {
+    "median_ms_per_plot": 0.946,
+    "mean_ms_per_plot": 1.118,
+    "window_reads": 1005,
+    "pixels_decoded": 237690,
+    "plots_answered_from_overview": 0,
+    "cog_range_requests": 1098
+   },
+   "cube+overview": {
+    "median_ms_per_plot": 0.861,
+    "mean_ms_per_plot": 1.061,
+    "window_reads": 985,
+    "pixels_decoded": 235707,
+    "plots_answered_from_overview": 20,
+    "cog_range_requests": 1078
+   },
+   "files_per_query_original": 5
+  },
+  "eudr_hansen_only": {
+   "original": {
+    "median_ms_per_plot": 0.963,
+    "mean_ms_per_plot": 1.004,
+    "window_reads": 3015,
+    "pixels_decoded": 713070,
+    "plots_answered_from_overview": 0,
+    "cog_range_requests": 3294
+   },
+   "cube": {
+    "median_ms_per_plot": 0.899,
+    "mean_ms_per_plot": 1.027,
+    "window_reads": 1005,
+    "pixels_decoded": 237690,
+    "plots_answered_from_overview": 0,
+    "cog_range_requests": 1098
+   },
+   "cube+overview": {
+    "median_ms_per_plot": 0.921,
+    "mean_ms_per_plot": 1.087,
+    "window_reads": 985,
+    "pixels_decoded": 235707,
+    "plots_answered_from_overview": 20,
+    "cog_range_requests": 1078
+   },
+   "files_per_query_original": 3
+  },
+  "legacy": {
+   "original": {
+    "median_ms_per_plot": 0.887,
+    "mean_ms_per_plot": 0.913,
+    "window_reads": 2010,
+    "pixels_decoded": 475380,
+    "plots_answered_from_overview": 0,
+    "cog_range_requests": 2196
+   },
+   "cube": {
+    "median_ms_per_plot": 0.832,
+    "mean_ms_per_plot": 1.073,
+    "window_reads": 1005,
+    "pixels_decoded": 237690,
+    "plots_answered_from_overview": 0,
+    "cog_range_requests": 1098
+   },
+   "cube+overview": {
+    "median_ms_per_plot": 0.858,
+    "mean_ms_per_plot": 1.026,
+    "window_reads": 985,
+    "pixels_decoded": 235707,
+    "plots_answered_from_overview": 20,
+    "cog_range_requests": 1078
+   },
+   "files_per_query_original": 2
+  },
+  "rspo": {
+   "original": {
+    "median_ms_per_plot": 0.897,
+    "mean_ms_per_plot": 0.926,
+    "window_reads": 3015,
+    "pixels_decoded": 713070,
+    "plots_answered_from_overview": 0,
+    "cog_range_requests": 3294
+   },
+   "cube": {
+    "median_ms_per_plot": 0.886,
+    "mean_ms_per_plot": 1.01,
+    "window_reads": 1005,
+    "pixels_decoded": 237690,
+    "plots_answered_from_overview": 0,
+    "cog_range_requests": 1098
+   },
+   "cube+overview": {
+    "median_ms_per_plot": 0.927,
+    "mean_ms_per_plot": 1.053,
+    "window_reads": 1004,
+    "pixels_decoded": 237648,
+    "plots_answered_from_overview": 1,
+    "cog_range_requests": 1097
+   },
+   "files_per_query_original": 3
+  }
+ },
+ "report_csv": {
+  "eudr": {
+   "c2_agree": 9,
+   "of": 17,
+   "rows": [
+    {
+     "plot": "P-0001",
+     "csv_flag": false,
+     "ours": true,
+     "def_px": 10
+    },
+    {
+     "plot": "P-0003",
+     "csv_flag": true,
+     "ours": false,
+     "def_px": 0
+    },
+    {
+     "plot": "P-0004",
+     "csv_flag": false,
+     "ours": false,
+     "def_px": 0
+    },
+    {
+     "plot": "P-0005",
+     "csv_flag": true,
+     "ours": false,
+     "def_px": 0
+    },
+    {
+     "plot": "P-0006",
+     "csv_flag": false,
+     "ours": false,
+     "def_px": 0
+    },
+    {
+     "plot": "P-0008",
+     "csv_flag": true,
+     "ours": false,
+     "def_px": 0
+    },
+    {
+     "plot": "P-0009",
+     "csv_flag": false,
+     "ours": false,
+     "def_px": 0
+    },
+    {
+     "plot": "P-0010",
+     "csv_flag": true,
+     "ours": false,
+     "def_px": 0
+    },
+    {
+     "plot": "P-0011",
+     "csv_flag": false,
+     "ours": false,
+     "def_px": 0
+    },
+    {
+     "plot": "P-0013",
+     "csv_flag": true,
+     "ours": false,
+     "def_px": 0
+    },
+    {
+     "plot": "P-0014",
+     "csv_flag": false,
+     "ours": true,
+     "def_px": 2
+    },
+    {
+     "plot": "P-0015",
+     "csv_flag": false,
+     "ours": false,
+     "def_px": 0
+    },
+    {
+     "plot": "P-0016",
+     "csv_flag": false,
+     "ours": true,
+     "def_px": 1
+    },
+    {
+     "plot": "P-0017",
+     "csv_flag": false,
+     "ours": false,
+     "def_px": 0
+    },
+    {
+     "plot": "P-0018",
+     "csv_flag": false,
+     "ours": false,
+     "def_px": 0
+    },
+    {
+     "plot": "P-0019",
+     "csv_flag": false,
+     "ours": false,
+     "def_px": 0
+    },
+    {
+     "plot": "P-0020",
+     "csv_flag": false,
+     "ours": false,
+     "def_px": 0
+    }
+   ]
+  },
+  "eudr_hansen_only": {
+   "c2_agree": 9,
+   "of": 17,
+   "rows": [
+    {
+     "plot": "P-0001",
+     "csv_flag": false,
+     "ours": true,
+     "def_px": 38
+    },
+    {
+     "plot": "P-0003",
+     "csv_flag": true,
+     "ours": false,
+     "def_px": 0
+    },
+    {
+     "plot": "P-0004",
+     "csv_flag": false,
+     "ours": false,
+     "def_px": 0
+    },
+    {
+     "plot": "P-0005",
+     "csv_flag": true,
+     "ours": true,
+     "def_px": 18
+    },
+    {
+     "plot": "P-0006",
+     "csv_flag": false,
+     "ours": true,
+     "def_px": 18
+    },
+    {
+     "plot": "P-0008",
+     "csv_flag": true,
+     "ours": false,
+     "def_px": 0
+    },
+    {
+     "plot": "P-0009",
+     "csv_flag": false,
+     "ours": false,
+     "def_px": 0
+    },
+    {
+     "plot": "P-0010",
+     "csv_flag": true,
+     "ours": false,
+     "def_px": 0
+    },
+    {
+     "plot": "P-0011",
+     "csv_flag": false,
+     "ours": false,
+     "def_px": 0
+    },
+    {
+     "plot": "P-0013",
+     "csv_flag": true,
+     "ours": true,
+     "def_px": 3
+    },
+    {
+     "plot": "P-0014",
+     "csv_flag": false,
+     "ours": true,
+     "def_px": 7
+    },
+    {
+     "plot": "P-0015",
+     "csv_flag": false,
+     "ours": false,
+     "def_px": 0
+    },
+    {
+     "plot": "P-0016",
+     "csv_flag": false,
+     "ours": true,
+     "def_px": 2
+    },
+    {
+     "plot": "P-0017",
+     "csv_flag": false,
+     "ours": false,
+     "def_px": 0
+    },
+    {
+     "plot": "P-0018",
+     "csv_flag": false,
+     "ours": true,
+     "def_px": 1
+    },
+    {
+     "plot": "P-0019",
+     "csv_flag": false,
+     "ours": false,
+     "def_px": 0
+    },
+    {
+     "plot": "P-0020",
+     "csv_flag": false,
+     "ours": false,
+     "def_px": 0
+    }
+   ]
+  },
+  "legacy": {
+   "c2_agree": 9,
+   "of": 17,
+   "rows": [
+    {
+     "plot": "P-0001",
+     "csv_flag": false,
+     "ours": true,
+     "def_px": 38
+    },
+    {
+     "plot": "P-0003",
+     "csv_flag": true,
+     "ours": false,
+     "def_px": 0
+    },
+    {
+     "plot": "P-0004",
+     "csv_flag": false,
+     "ours": false,
+     "def_px": 0
+    },
+    {
+     "plot": "P-0005",
+     "csv_flag": true,
+     "ours": false,
+     "def_px": 0
+    },
+    {
+     "plot": "P-0006",
+     "csv_flag": false,
+     "ours": false,
+     "def_px": 0
+    },
+    {
+     "plot": "P-0008",
+     "csv_flag": true,
+     "ours": false,
+     "def_px": 0
+    },
+    {
+     "plot": "P-0009",
+     "csv_flag": false,
+     "ours": false,
+     "def_px": 0
+    },
+    {
+     "plot": "P-0010",
+     "csv_flag": true,
+     "ours": false,
+     "def_px": 0
+    },
+    {
+     "plot": "P-0011",
+     "csv_flag": false,
+     "ours": false,
+     "def_px": 0
+    },
+    {
+     "plot": "P-0013",
+     "csv_flag": true,
+     "ours": false,
+     "def_px": 0
+    },
+    {
+     "plot": "P-0014",
+     "csv_flag": false,
+     "ours": false,
+     "def_px": 0
+    },
+    {
+     "plot": "P-0015",
+     "csv_flag": false,
+     "ours": false,
+     "def_px": 0
+    },
+    {
+     "plot": "P-0016",
+     "csv_flag": false,
+     "ours": true,
+     "def_px": 1
+    },
+    {
+     "plot": "P-0017",
+     "csv_flag": false,
+     "ours": false,
+     "def_px": 0
+    },
+    {
+     "plot": "P-0018",
+     "csv_flag": false,
+     "ours": true,
+     "def_px": 1
+    },
+    {
+     "plot": "P-0019",
+     "csv_flag": false,
+     "ours": false,
+     "def_px": 0
+    },
+    {
+     "plot": "P-0020",
+     "csv_flag": false,
+     "ours": false,
+     "def_px": 0
+    }
+   ]
+  },
+  "rspo": {
+   "c2_agree": 6,
+   "of": 17,
+   "rows": [
+    {
+     "plot": "P-0001",
+     "csv_flag": false,
+     "ours": true,
+     "def_px": 47
+    },
+    {
+     "plot": "P-0003",
+     "csv_flag": true,
+     "ours": false,
+     "def_px": 0
+    },
+    {
+     "plot": "P-0004",
+     "csv_flag": false,
+     "ours": true,
+     "def_px": 2
+    },
+    {
+     "plot": "P-0005",
+     "csv_flag": true,
+     "ours": true,
+     "def_px": 18
+    },
+    {
+     "plot": "P-0006",
+     "csv_flag": false,
+     "ours": true,
+     "def_px": 18
+    },
+    {
+     "plot": "P-0008",
+     "csv_flag": true,
+     "ours": true,
+     "def_px": 22
+    },
+    {
+     "plot": "P-0009",
+     "csv_flag": false,
+     "ours": true,
+     "def_px": 19
+    },
+    {
+     "plot": "P-0010",
+     "csv_flag": true,
+     "ours": true,
+     "def_px": 16
+    },
+    {
+     "plot": "P-0011",
+     "csv_flag": false,
+     "ours": true,
+     "def_px": 5
+    },
+    {
+     "plot": "P-0013",
+     "csv_flag": true,
+     "ours": true,
+     "def_px": 6
+    },
+    {
+     "plot": "P-0014",
+     "csv_flag": false,
+     "ours": true,
+     "def_px": 7
+    },
+    {
+     "plot": "P-0015",
+     "csv_flag": false,
+     "ours": true,
+     "def_px": 39
+    },
+    {
+     "plot": "P-0016",
+     "csv_flag": false,
+     "ours": true,
+     "def_px": 6
+    },
+    {
+     "plot": "P-0017",
+     "csv_flag": false,
+     "ours": false,
+     "def_px": 0
+    },
+    {
+     "plot": "P-0018",
+     "csv_flag": false,
+     "ours": true,
+     "def_px": 32
+    },
+    {
+     "plot": "P-0019",
+     "csv_flag": false,
+     "ours": false,
+     "def_px": 0
+    },
+    {
+     "plot": "P-0020",
+     "csv_flag": false,
+     "ours": true,
+     "def_px": 2
+    }
+   ]
+  }
+ },
+ "pixels": {
+  "lossyear_exact_pct": 100.0,
+  "canopy_threshold_exact": {
+   "0": 100.0,
+   "10": 100.0,
+   "15": 100.0,
+   "20": 100.0,
+   "25": 100.0,
+   "30": 100.0,
+   "50": 100.0
+  },
+  "canopy_pct_mae": 10.313,
+  "canopy_pct_rmse": 13.287,
+  "canopy_class_exact_pct": 100.0,
+  "not_land_exact_pct": 100.0,
+  "forest2020_exact_pct": 100.0,
+  "forest2020_share_pct": 82.603,
+  "plantation_exact_pct": 100.0,
+  "plantation_share_pct": 73.738,
+  "height5m_exact_pct": 100.0,
+  "strict_pa_px_flagged": 217387,
+  "strict_pa_px_centre_inside": 213814,
+  "strict_pa_missed_px": 0,
+  "restricted_px_flagged": 58006,
+  "restricted_px_centre_inside": 56421,
+  "restricted_missed_px": 0,
+  "decision_byte_matches_cube_pct": 100.0,
+  "eudr_forest2020_share_pct": 14.653,
+  "eudr_deforested_share_pct": 0.917,
+  "hansen_only_forest2020_share_pct": 53.598,
+  "hansen_only_deforested_share_pct": 10.194
+ }
+}

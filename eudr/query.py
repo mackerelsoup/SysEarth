@@ -17,6 +17,7 @@ import numpy as np
 import rasterio
 from rasterio.features import rasterize
 from rasterio.windows import from_bounds, Window
+from shapely import make_valid
 from shapely.geometry import shape
 from shapely.strtree import STRtree
 
@@ -46,14 +47,14 @@ class VectorIndex:
     """Exact polygon-overlap test for protected / restricted areas."""
 
     def __init__(self, features):
-        self.geoms = [shape(f["geometry"]) for f in features]
+        self.geoms = [make_valid(shape(f["geometry"])) for f in features]
         self.tree = STRtree(self.geoms) if self.geoms else None
 
     def intersects(self, geom):
         if self.tree is None:
             return False
         for i in self.tree.query(geom, predicate="intersects"):
-            if self.geoms[int(i)].intersection(geom).area > 0:
+            if self.geoms[int(i)].intersection(make_valid(geom)).area > 0:
                 return True
         return False
 

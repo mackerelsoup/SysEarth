@@ -17,7 +17,7 @@ import math
 
 import numpy as np
 import rasterio
-from shapely.geometry import Polygon, mapping, shape
+from shapely.geometry import Polygon, box, mapping, shape
 
 M_PER_DEG = 111_195.0
 
@@ -35,7 +35,8 @@ def blob(rng, lon, lat, area_ha):
     xy = (pts @ R.T) * scale_m
     lons = lon + xy[:, 0] / (M_PER_DEG * math.cos(math.radians(lat)))
     lats = lat + xy[:, 1] / M_PER_DEG
-    return Polygon(np.c_[lons, lats])
+    poly = Polygon(np.c_[lons, lats])
+    return poly if poly.is_valid else poly.convex_hull
 
 
 def main():
@@ -62,7 +63,11 @@ def main():
     def size():
         return float(np.exp(rng.uniform(np.log(0.3), np.log(30))))
 
+    inner = box(bounds.left + margin, bounds.bottom + margin, bounds.right - margin, bounds.top - margin)
+
     def add(poly, kind):
+        if not inner.contains(poly):   # keep every plot fully inside the clipped rasters
+            return
         feats.append({"type": "Feature", "geometry": mapping(poly),
                       "properties": {"ProductionPlace": f"S-{len(feats) + 1:04d}", "kind": kind,
                                      "Area": round(poly.area * M_PER_DEG ** 2 * math.cos(math.radians(poly.centroid.y)) / 1e4, 2)}})
@@ -84,7 +89,8 @@ def main():
         pas += [shape(f["geometry"]) for f in json.load(open(p))["features"]]
     pas = [g for g in pas if g.area > 0]
     if pas:
-        for _ in range(a.n_pa):
+        target = len(feats) + a.n_pa
+        while len(feats) < target:
             g = pas[rng.integers(len(pas))]
             ring = g.exterior if g.geom_type == "Polygon" else max(g.geoms, key=lambda x: x.area).exterior
             pt = ring.interpolate(rng.uniform(0, ring.length))

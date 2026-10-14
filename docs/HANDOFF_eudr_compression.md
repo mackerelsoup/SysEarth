@@ -62,14 +62,18 @@ Originally committed on `claude/intelligent-turing-5sn6lg`; also present on `cla
 - GitHub push failed once with 403 and succeeded on retry. Do not open a PR unless asked.
 - Commit trailers: use whatever the current session's harness specifies.
 
+## Status (session 2, 2026-10-14)
+All five deliverables are drafted. See **docs/REPORT.md** (main report) and docs/01_layer_analysis.md.
+- `lossyear` covers 2001-2025 (v1.13). The EUDR window is 2021-2025; the legacy rule is 2021-2023.
+- The CSV `c2` cannot be reproduced by any Hansen rule, so fidelity is measured against the original layers.
+- Layers come from GLAD GCS, ESA S3 and Overture S3; JRC, WDPA and Zenodo are blocked. See data/layers/PROVENANCE.md and scripts/fetch_layers.py.
+- Config: eudr/config.json. Forest 2020 = GLCLU 2020 classes 27-48 and 127-148. Plantation = GLAD Commodities **2015** classes 2 and 4. TCH >= 5 m. PA = OSM via Overture (3 strict). Restricted areas are synthetic.
+- Results: decision fidelity 100% on 1,005 plots x 4 regimes. The cube is 3.6x smaller than the needed originals and the decision byte 16.5x. Over HTTP at 40 ms latency: 72 -> 19 ms per plot.
+- Findings: P-0005 and P-0006 lie inside Khlong Phraya WS (OSM), but the CSV says no overlap. 22% of strict-PA pixels are 2015 plantation. Under EUDR, the 5 CSV-flagged plots are clean, and P-0001, P-0014 and P-0016 have 1-10 deforested px.
+- The venv must be recreated per session: `pip install rasterio shapely pyproj numpy matplotlib pyarrow`.
+
 ## Open items / next steps
-1. Check the `lossyear` year range and tile version, then fix the loss window.
-2. Get JRC 2020 forest map, WDPA Thailand and a plantation layer, clipped to `data/clipped/clip_bbox.json`. Test sandbox downloads; otherwise the user uploads them.
-3. Confirm with the user:
-   - the exact `c2` rule
-   - the commodity (rubber or palm)
-   - whether to generate synthetic plots, including protected-area overlaps and post-2020 loss
-4. Write the EUDR layer-by-layer analysis table (keep / simplify / merge / drop, with regulatory reason).
-5. Build the encoder (bit-packed COG or Zarr), the original-layer query path and the compressed query path, with the same polygon-to-pixel rule for both.
-6. Benchmark storage, query time and extra storage. Measure decision fidelity on `c2`, `d1`, `d2`, and pixel fidelity.
-7. Bonus cost model: extrapolate from the clipped region to the full tile and to a country.
+1. Swap in JRC GFC2020 and WDPA when they can be downloaded, and check the P-0005/P-0006 overlap against WDPA.
+2. Use real restricted-use areas (Thai RFD National Reserved Forests).
+3. Add a minimum-area (0.5 ha) or connectivity option for `c2`; add GLAD/DIST alerts in spare bits 14-15.
+4. Use a 2019/2020 plantation map if one becomes available.

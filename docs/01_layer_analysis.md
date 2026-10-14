@@ -54,11 +54,11 @@ Sizes are for the 1597 × 1578 px clip (2.52 M pixels at 0.00025°, about 27.5 m
 | `datamask` (0/1/2) | Hansen | Masking only | **Simplify** to 1 bit "not land" | bit 13 | Water is never forest and never a plot. |
 | `gain` 2000–2012 | Hansen | No | **Drop** | – | Gain predates the cut-off and is a static 2000–12 flag. A 2020 baseline captures regrowth better. |
 | `first` / `last` composites | Hansen | No | **Drop** (never downloaded) | – | Reflectance imagery, not a decision input. 4 bands × 2 epochs would dominate storage. |
-| 2020 forest baseline | see §1.4 | **Yes** | **Merge** into 1 bit | bit 8 | Replaces "Hansen 2000 canopy minus loss until 2020", which ignores 2000–2020 regrowth and plantations. JRC GFC2020 is the EU's reference map. |
-| Tree height ≥ 5 m (2020) | GLAD TCH / GLCLU | Yes (forest definition) | **Merge** into 1 bit | bit 9 | The 5 m criterion. Optional in the default rule because the baseline already applies it. |
-| Tree-crop plantation | GLAD commodities (pre-cut-off) | **Yes** | **Merge** into 1 bit | bit 10 | "Agricultural use" is excluded from forest. **Must be a pre-2020 map**: a post-2020 plantation map would hide exactly the forest-to-plantation conversion EUDR targets. |
-| Strict protected areas | WDPA (blocked here) / OSM via Overture | **Yes** (`d1`) | **Keep as vector** + 1 conservative bit | bit 11 + GeoJSON | The decision is a polygon intersection. The bit is burned *all-touched*, so it never misses an overlap, and hits are confirmed on the vector. |
-| Restricted-use areas | as above | **Yes** (`d2`) | as above | bit 12 + GeoJSON | as above |
+| 2020 forest baseline | GLAD GLCLU 2020 v2, classes 27–48 / 127–148 (tree cover ≥ 5 m). JRC GFC2020 is the EU reference but its host is blocked from this sandbox, and it drops in unchanged. | **Yes** | **Merge** into 1 bit | bit 8 | Replaces "Hansen 2000 canopy minus loss until 2020", which ignores 2000–2020 regrowth and plantations. JRC GFC2020 is the EU's reference map. |
+| Tree height ≥ 5 m (2020) | GLAD TCH 2020 (canopy height in metres) | Yes (forest definition) | **Merge** into 1 bit | bit 9 | The 5 m criterion. Optional in the default rule because the baseline already applies it. |
+| Tree-crop plantation | GLAD Commodities **2015**, class 2 (other plantation, incl. rubber) + class 4 (oil palm) | **Yes** | **Merge** into 1 bit | bit 10 | "Agricultural use" is excluded from forest. **Must be a pre-2020 map**: a post-2020 plantation map would hide exactly the forest-to-plantation conversion EUDR targets. |
+| Strict protected areas | OpenStreetMap via Overture Maps 2026-09-23.1 (WDPA is blocked here): Khlong Phraya WS (Ia), Than Bok Khorani NP and Khao Phanom Bencha NP (II) | **Yes** (`d1`) | **Keep as vector** + 1 conservative bit | bit 11 + GeoJSON | The decision is a polygon intersection. The bit is burned *all-touched*, so it never misses an overlap, and hits are confirmed on the vector. |
+| Restricted-use areas | none mapped in OSM for the clip area → 6 **synthetic** polygons (`tests/data/synthetic_restricted_areas.geojson`) only to test the `d2` path | **Yes** (`d2`) | as above | bit 12 + GeoJSON | as above |
 | GLAD / DIST alerts | GLAD | Post-2025 monitoring | **Optional extension** | spare bits 14–15 | Annual Hansen ends at 2025. Alerts would extend the window weekly. |
 
 ## 1.4 The false positives in the sample
@@ -68,4 +68,22 @@ rubber and oil palm), **46 % of all pixels in the clip show Hansen loss at some 
 2001–2025**. This is the rotation cycle of tree crops, not deforestation. A rule that uses
 only Hansen loss (`legacy`) or Hansen canopy in 2000 (`eudr_hansen_only`) flags plantation
 replanting. The two extra bits (forest baseline at 2020, pre-cut-off plantation mask) separate
-the cases. Their effect on the number of positive plots is quantified in the evaluation (§4).
+the cases:
+
+| Rule | Pixels counted as forest at the cut-off | Pixels deforested after 2020 | Synthetic + real plots with a `c2` indication (of 1,005) | Real plots flagged (of 17) |
+|---|---|---|---|---|
+| Legacy: any loss 2021–2023 | – | 6.8 % | 407 | 3 (P-0001, P-0016, P-0018) |
+| EUDR, Hansen only | 53.6 % | 10.2 % | 548 | 7 |
+| **EUDR with 2020 baseline and 2015 plantation mask** | **14.7 %** | **0.92 %** | **238** | **3 (P-0001: 10 px, P-0014: 2 px, P-0016: 1 px)** |
+
+In the clip area, 73.7 % of pixels are tree-crop plantation in 2015, which is why the
+plantation bit decides most outcomes. All five plots flagged in the CSV (and later cleared on
+site) are clean under the full EUDR rule, matching the field verification. The three remaining
+indications are 1–10 pixels (0.08–0.8 ha), which is what a `min_px` / minimum-area parameter is for.
+
+**Unexpected legality finding.** In the OSM boundary data, P-0005 and P-0006 lie **entirely inside
+Khlong Phraya Wildlife Sanctuary** (IUCN Ia), but the CSV reports `d1 = No overlap`. The OSM
+boundary is tagged `fixme=approximately`, and the CSV probably used WDPA, so this has to be checked
+against WDPA or the DNP boundary before any conclusion. It is consistent with the map, though: 22 % of
+strict-PA pixels are tree-crop plantation already in 2015 (encroachment), and the western edge of
+the sanctuary is where Hansen-only rules flag most loss.
