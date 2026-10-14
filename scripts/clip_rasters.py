@@ -18,8 +18,8 @@ Usage:
 Rasters are read one window at a time, so the full tile is never loaded.
 Inputs can be .tif files or directories (searched for *.tif).
 Outputs are written as <name>_clip.tif with the source dtype, nodata, CRS and
-band descriptions preserved. A clip_bbox.json describing the area is written
-to --out-dir.
+band descriptions preserved. clip_bbox.json (the area) and clip_area.geojson
+(the area plus the plots, for viewing) are written to --out-dir.
 """
 import argparse
 import json
@@ -143,6 +143,25 @@ def clip_one(src_path, bbox_ll, out_dir):
     return out_path, partial
 
 
+def write_preview(geojson_path, bbox, out_path):
+    """Write the clip box plus the source plots as one GeoJSON for viewing
+    (drag the file onto https://geojson.io)."""
+    west, south, east, north = bbox
+    box = {
+        "type": "Feature",
+        "properties": {"role": "clip_area"},
+        "geometry": {
+            "type": "Polygon",
+            "coordinates": [[[west, south], [east, south], [east, north], [west, north], [west, south]]],
+        },
+    }
+    with open(geojson_path) as fh:
+        plots = json.load(fh)["features"]
+    for f in plots:
+        f["properties"] = {**f.get("properties", {}), "role": "plot"}
+    out_path.write_text(json.dumps({"type": "FeatureCollection", "features": [box, *plots]}) + "\n")
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--geojson", required=True, help="GeoJSON whose vertices define the area (lon/lat, WGS84)")
@@ -176,6 +195,8 @@ def main():
         note = "  (WARNING: raster only partly covers the area)" if partial else ""
         print(f"{tif.name} -> {out_path} [{out_path.stat().st_size / 1e6:.2f} MB]{note}")
         written.append(out_path.name)
+
+    write_preview(args.geojson, bbox, out_dir / "clip_area.geojson")
 
     (out_dir / "clip_bbox.json").write_text(
         json.dumps(
