@@ -1,79 +1,151 @@
 # SysEarth handoff: EUDR geospatial compression challenge
 
-Working notes carried between sessions. Update this file as decisions land.
+Current state as of 2026-10-14 (end of session 2). Branch: `claude/gracious-goldberg-68rm95`
+(repo `mackerelsoup/SysEarth`), last commit `4a01959`. No PR open; do not open one unless asked.
 
-## Task (from the problem prompt)
-Show how SystemEarth can encode multiple geospatial layers across time and space in a compact, query-efficient form while preserving plot-level compliance decisions.
+**Start here:** the main deliverable is `docs/REPORT.md`. The regulation-based layer analysis is
+`docs/01_layer_analysis.md`, and layer sources are in `data/layers/PROVENANCE.md`.
 
-Deliverables:
-1. Analysis of which layers and attributes decide the outcome, and which can be simplified, summarised or dropped. Ground it in the regulation (forest definition, cut-off date).
-2. Encoding strategy combining layers and time steps.
-3. Working prototype that encodes a sample for one region and queries it.
-4. Evaluation against the original layers:
-   - storage reduction
-   - query speed and extra storage
-   - decision fidelity (% of plots where every compliance-relevant output matches)
-   - pixel fidelity
-5. Bonus: infrastructure and processing cost estimate.
+## 1. Task (from the problem prompt)
+Show how SystemEarth can encode multiple geospatial layers across time and space in a compact,
+query-efficient form while preserving plot-level compliance decisions.
 
-## Decisions so far
-- **Use case:** EUDR deforestation-free status for farm plots. Cut-off is 31 Dec 2020. Forest per FAO: >0.5 ha, canopy >10%, trees >5 m, plantations excluded. Polygons are required above 4 ha. Check the current EUDR application dates before citing any.
-- **Second regime (optional):** show the same encoding answering another regime (e.g. RSPO 2005 cut-off) by changing parameters only.
-- **Decision-fidelity scope:** the outputs reproducible from layers are CSV columns `c2` (deforestation indication), `d1` (strict protected area overlap) and `d2` (restricted-use area overlap). Other CSV sections (labour, tax, FPIC, quantities) are non-spatial and out of scope.
-- **Baseline for comparison:** compare against Cloud-Optimized GeoTIFF reads, not plain GeoTIFF.
+| # | Deliverable | Status | Where |
+|---|---|---|---|
+| 1 | Layer analysis grounded in the regulation | Done | `docs/01_layer_analysis.md` |
+| 2 | Encoding strategy | Done | `docs/REPORT.md` §2, `eudr/encoding.py` |
+| 3 | Working prototype for one region | Done | `eudr/`, `scripts/` |
+| 4 | Evaluation: storage, query speed and extra storage, decision fidelity, pixel fidelity | Done | `docs/REPORT.md` §4, `data/cube/evaluation.json` |
+| 5 | Bonus: infrastructure and cost estimate | Done | `docs/REPORT.md` §5 |
 
-## Sample data
-Originally committed on `claude/intelligent-turing-5sn6lg`; also present on `claude/gracious-goldberg-68rm95`.
-- `tests/data/17plots-valid.geojson`: 17 polygon plots, 80.5 ha total, WGS84. Fields: ProducerName, ProducerCountry, ProductionPlace (plot ID), Area (ha).
-- `tests/data/17plots-valid.csv`: the existing due-diligence report. 17 rows, 35 columns, joins on `a3_plot_id`.
-- `tests/data/clip_area_preview.geojson`: clip square plus plots, for viewing on geojson.io.
-- `scripts/clip_rasters.py`: clips GeoTIFFs to a square around the GeoJSON vertices plus a 5 km buffer (tested on synthetic tiles). Needs `rasterio`; writes `clip_bbox.json` and `clip_area.geojson`.
-- `data/clipped/` (added by the user in commit d919524): Hansen GFC-2025-v1.13 tile 10N_090E clipped to the area. Files: datamask, gain, lossyear, treecover2000 (~2.1 MB total). `first`/`last` not included and not needed.
+## 2. Decisions made
+- **Use case:** EUDR deforestation-free status for plots.
+  - Cut-off is 31 Dec 2020.
+  - Forest follows FAO: >0.5 ha, >5 m, canopy >10%, agricultural plantations excluded.
+- **EUDR dates (verified):** applies from 30 Dec 2026 for large and medium operators (Reg. (EU) 2025/2650). Micro and small operators not already under the EU Timber Regulation follow from 30 Jun 2027. The May 2026 simplification review confirmed both dates.
+- **Outputs in scope:** CSV columns `c2` (deforestation indication), `d1` (strict PA overlap) and `d2` (restricted-use overlap). All other columns are non-spatial.
+- **Fidelity reference:** decision fidelity is measured against the *original layers* evaluated with the same explicit rule. It is not measured against the CSV, because the CSV's `c2` is not reproducible (see §5).
+- **Comparison baseline:** Cloud-Optimized GeoTIFF (COG) reads, including an HTTP range-request benchmark with simulated object-storage latency.
+- **Regimes, all parameters only:**
+  - `eudr`: baseline and plantation mask on.
+  - `eudr_hansen_only`: Hansen data only.
+  - `legacy`: any loss 2021–2023, the rule the CSV claims to use.
+  - `rspo`: cut-off 2005, canopy >30%, baseline and plantation mask off.
+- **Plantation mask must date from before the cut-off.** A post-2020 map would hide forest converted to plantation after the cut-off.
+- **Polygon-to-pixel rule:** pixels whose centre is inside the plot. If a plot contains no centre, fall back to all touched pixels. Both query paths use this rule.
+- **Protected-area rule:** the PA bit is burned in all-touched, so it can over-cover but never miss. Every hit is confirmed with an exact vector intersection.
+- **Codec:** deflate COG with 256 px tiles. Zstd was only 3% smaller.
 
-## Key facts about the sample
-- **Location:** southern Thailand, Surat Thani province. CSV says district "Chai Buri" (unverified). Plots span lon 98.77–99.08, lat 8.43–8.58, centre ≈ 8.51°N, 98.94°E, in four clusters.
-- **Hansen tile:** all plots in **10N_090E** (named by top-left corner; lat 0–10°N, lon 90–100°E).
-- **Clip area:** lon 98.727–99.126, lat 8.309–8.704, a 43.9 km square (~1,600 × 1,600 px at 30 m). Leeway 5 km E/W, ~13.6 km N/S.
-- **Plots over 4 ha:** P-0001, P-0003, P-0005, P-0006.
-- **Deforestation flags:** 5/17 flagged `b. Indication of deforestation` (P-0003, P-0005, P-0008, P-0010, P-0013). All five end `Deforestation-free` after on-site verification → Hansen check gave false positives. Likely cause: Hansen loss fires on harvested/replanted tree crops (rubber, oil palm) → argument for a forest baseline and a plantation mask.
-- **Overlap results:** `d1` and `d2` are 17/17 "no overlap" → no positive cases; synthetic plots needed to test them.
-- **CSV data quality:** partly templated.
-  - Reference links point to other plots' IDs (e.g. `hyperlink-RG1-P-0002`, a plot not in the files).
-  - Quantity columns step by fixed increments and don't track plot area.
-  - All dates identical.
-- **Current rule (unconfirmed):** `c1` says "Hansen Tree Cover Loss 2021-2023". Seems to be any loss in that window, no canopy threshold or forest baseline.
-- **Layer version note:** clipped tiles are v1.13 (GFC-2025), not v1.11, so loss data may extend past 2023. Check which years `lossyear` covers before fixing the post-cut-off window.
-- **Polygon-to-pixel rule:** sample ≈ 900 pixels total; smallest plot (0.53 ha) ≈ 6 pixels. The overlap rule (any pixel / pixel centre / minimum fraction) must be fixed once and applied identically to original and compressed paths.
+## 3. Encoding (one uint16 per 30 m Hansen pixel)
 
-## Layer analysis (draft, to finish)
-- **Needed:** `treecover2000`, `lossyear`, a 2020 forest baseline (JRC GFC2020 recommended), protected areas (WDPA Thailand), ideally a plantation mask.
-- **Droppable or mergeable:**
-  - raw canopy %: replace with a "canopy >10%" bit.
-  - year-level loss: collapse to before / after cut-off.
-  - `first`, `last` imagery: drop.
-  - `gain`: probably drop.
-  - `datamask`: keep only to mask water.
-- **Proposed encoding:** one byte per pixel of bit-packed flags (forest at 2020, lost before 2021, lost after 2020, in protected/restricted area, spare bits), stored as a single-band COG or Zarr. Keep plots and protected areas as vectors.
-- **GLAD alerts:** optional extension for post-Hansen loss; coverage of Thai plantation landscapes unverified.
+| Bits | Content |
+|---|---|
+| 0–4 | loss year 0–25, lossless |
+| 5–7 | canopy 2000 class, bin edges 0/10/15/20/25/30/50/100 (exact for those thresholds) |
+| 8 | forest 2020 (GLCLU, trees ≥5 m) |
+| 9 | tree height ≥5 m (TCH 2020) |
+| 10 | plantation 2015 |
+| 11 | strict PA |
+| 12 | restricted-use area |
+| 13 | not land |
+| 14–15 | spare (e.g. GLAD/DIST alerts) |
 
-## Environment notes
-- Sandbox outbound HTTPS goes through a proxy that blocks some hosts (Nominatim refused). Whether Hansen, WDPA and JRC downloads work from the sandbox is **untested**.
-- No `rasterio` by default; install into a venv under the session scratchpad (ephemeral).
-- GitHub push failed once with 403 and succeeded on retry. Do not open a PR unless asked.
-- Commit trailers: use whatever the current session's harness specifies.
+Alongside the cube:
+- a 16×16 block overview (OR of flags, max of loss year and canopy; +0.5% storage);
+- an optional uint8 decision byte for the EUDR regime only;
+- the PA vectors.
 
-## Status (session 2, 2026-10-14)
-All five deliverables are drafted. See **docs/REPORT.md** (main report) and docs/01_layer_analysis.md.
-- `lossyear` covers 2001-2025 (v1.13). The EUDR window is 2021-2025; the legacy rule is 2021-2023.
-- The CSV `c2` cannot be reproduced by any Hansen rule, so fidelity is measured against the original layers.
-- Layers come from GLAD GCS, ESA S3 and Overture S3; JRC, WDPA and Zenodo are blocked. See data/layers/PROVENANCE.md and scripts/fetch_layers.py.
-- Config: eudr/config.json. Forest 2020 = GLCLU 2020 classes 27-48 and 127-148. Plantation = GLAD Commodities **2015** classes 2 and 4. TCH >= 5 m. PA = WDPA Mar 2016 from the UNEP-WCMC archive bucket s3://wdpa via scripts/fetch_wdpa.py (3 strict); OSM via Overture is a cross-check. Restricted areas are synthetic.
-- Results: decision fidelity 100% on 1,005 plots x 4 regimes. The cube is 3.6x smaller than the needed originals and the decision byte 16.5x. Over HTTP at 40 ms latency: 72 -> 19 ms per plot.
-- Findings: P-0005 and P-0006 overlap Khlong Phraya WS (WDPA 32%/24%, OSM 100%), but the CSV says no overlap. 22% of strict-PA pixels are 2015 plantation. Under EUDR, the 5 CSV-flagged plots are clean, and P-0001, P-0014 and P-0016 have 1-10 deforested px.
-- The venv must be recreated per session: `pip install rasterio shapely pyproj numpy matplotlib pyarrow`.
+## 4. Data and configuration (`eudr/config.json`)
 
-## Open items / next steps
-1. Swap in JRC GFC2020 and a current WDPA release when they can be downloaded (the archive's newest is 2016), and confirm the P-0005/P-0006 overlap with the DNP boundary.
-2. Use real restricted-use areas (Thai RFD National Reserved Forests).
-3. Add a minimum-area (0.5 ha) or connectivity option for `c2`; add GLAD/DIST alerts in spare bits 14-15.
-4. Use a 2019/2020 plantation map if one becomes available.
+| Layer | Source | Details |
+|---|---|---|
+| Hansen | GFC-2025-v1.13, tile 10N_090E, in `data/clipped/` (user-supplied) | `lossyear` covers 2001–2025 |
+| Forest 2020 | GLAD GLCLU 2020 v2 | classes 27–48 and 127–148 |
+| Plantation | GLAD Commodities **2015** | class 2 = other plantation (includes rubber), 4 = oil palm |
+| Height | GLAD TCH 2020 | ≥5 m |
+| Strict PA | **WDPA March 2016** via `scripts/fetch_wdpa.py` → `data/layers/wdpa_mar2016_aoi.geojson` | IUCN Ia/Ib/II = strict |
+| Restricted-use areas | **synthetic**, `tests/data/synthetic_restricted_areas.geojson` | 6 polygons, only to test `d2`; no real source exists in WDPA or OSM for this area |
+| Cross-check | OSM via Overture, `data/layers/protected_areas_overture.geojson` | – |
+| Unused but fetched | ESA WorldCover 2020, GLAD Commodities 2024, commodity gain, LandUse 2024, GLCLU change | – |
+
+- **WDPA in the clip area:** Khlong Phraya WS (ID 4015, Ia), Khao Phanom Bencha NP (5068, II) and Than Bok Khorani Marine NP (312954, II). All are polygons; there are no point-only sites.
+- **Test plots:** `tests/data/synthetic_plots.geojson` holds 988 plots: 600 random, 138 on post-2020 loss, 250 on PA boundaries. With the 17 real plots that makes 1,005.
+
+## 5. Key findings
+1. **The CSV `c2` is not reproducible from Hansen with any rule tried.** P-0008 and P-0010 are flagged with zero post-2020 loss, while P-0001 has 38 px of 2022 loss and is unflagged. Links, quantities and dates in the CSV are templated, so the CSV is probably a mock-up.
+2. **The landscape is a plantation mosaic.** 46% of pixels show loss at some point from 2001–2025, and 74% are plantation in 2015.
+
+   | Rule | Pixels flagged as deforested | Plots with `c2`, of 1,005 |
+   |---|---|---|
+   | Hansen only | 10.2% | 548 |
+   | Full EUDR (baseline and plantation mask) | 0.92% | 235 |
+
+3. **Real plots under EUDR.**
+   - The five plots flagged in the CSV, all cleared on site, are clean.
+   - P-0001 (10 px), P-0014 (2 px) and P-0016 (1 px) have small indications.
+   - `min_px=1` is maximally cautious.
+4. **P-0005 and P-0006 overlap Khlong Phraya Wildlife Sanctuary (IUCN Ia)**, but the CSV says `d1 = no overlap`.
+
+   | Plot | Inside WDPA 2016 | Inside OSM 2026 |
+   |---|---|---|
+   | P-0005 | 32% | 100% |
+   | P-0006 | 24% | 100% |
+
+   The two boundaries differ by up to 815 m on the western edge (IoU 0.82). Confirm with the official DNP boundary. 22% of strict-PA pixels are 2015 plantation, which suggests encroachment.
+
+## 6. Results (`data/cube/evaluation.json`, `data/cube/http_bench_17plots.json`)
+
+| Measure | Result |
+|---|---|
+| Decision fidelity | **100%** of 1,005 plots in all 4 regimes, with and without the overview (`c2` / `d1` / `d2` positives under EUDR: 235 / 96 / 180) |
+| Storage | 4.66 MB originals vs **1.29 MB** cube + overview + vectors (**3.6×**); decision byte + vectors 0.29 MB (**16.1×**) |
+| Pixel fidelity | 100% on every field used by a rule; canopy % MAE 10.3 pts (not used); PA bit misses 0 px and has 1.8% extra boundary pixels |
+| COG tile requests (EUDR, 1,005 plots) | 5,495 → 1,099 |
+| HTTP query, 17 plots at 40 ms latency | 72 → 19 ms per plot; 51 → 10 requests |
+| Local-disk speed | about 1 ms per plot either way (rasterisation-bound) |
+| Compression headroom | entropy-bound: collapsing pre-2020 loss into cut-off epochs gives identical decisions but saves only about 10% more |
+| Overview | resolves only 2% of plots in this high-churn landscape |
+| Cost, global land | cube about 82 GB (≈$1.9/month on S3); build about 37 core-hours (≈$1.50); 1 M plot checks under $1 |
+
+## 7. How to reproduce
+
+The venv is ephemeral and must be recreated each session:
+
+```bash
+python3 -m venv /tmp/venv && /tmp/venv/bin/pip install rasterio shapely pyproj numpy matplotlib pyarrow pyogrio geopandas
+PY=/tmp/venv/bin/python
+$PY scripts/fetch_layers.py          # GLAD (GCS) + ESA (S3) + Overture (S3), about 1 min
+$PY scripts/fetch_wdpa.py --work /tmp/wdpa_dl   # 1 GB download, about 1 min; keeps only the clip
+$PY scripts/build_cube.py            # -> data/cube/
+$PY scripts/make_synthetic_plots.py --pa data/layers/wdpa_mar2016_aoi.geojson tests/data/synthetic_restricted_areas.geojson --n-pa 250
+$PY scripts/evaluate.py --plots tests/data/17plots-valid.geojson tests/data/synthetic_plots.geojson
+$PY scripts/bench_http.py --plots tests/data/17plots-valid.geojson --latency-ms 40 --out data/cube/http_bench_17plots.json
+$PY scripts/plot_rules.py            # docs/img/rules_compared.png
+```
+
+**Code map**
+
+| File | Contents |
+|---|---|
+| `eudr/encoding.py` | bit layout, encode, overview, decision byte |
+| `eudr/rules.py` | `Rule` dataclass and `REGIMES` |
+| `eudr/query.py` | `OriginalLayers`, `CubeLayers`, `VectorIndex`, shared `plot_mask` |
+| `scripts/clip_rasters.py` | original Hansen clipper |
+
+## 8. Environment notes
+- **Network access:**
+  - *Blocked:* JRC forobs, protectedplanet.net, Zenodo, Overpass, GFW API, glad.umd.edu, data.go.th, dnp.go.th, Hugging Face, Wikidata.
+  - *Reachable:* storage.googleapis.com (`earthenginepartners-hansen`), S3 (`esa-worldcover`, `overturemaps-us-west-2`, `wdpa`), PyPI, raw.githubusercontent.com.
+  - Do not try to route around blocked hosts.
+- **The `s3://wdpa` bucket** (eu-west-1) is UNEP-WCMC's archive: listing is public, but some objects return 403. The newest readable full release is `2016/WDPA_Mar2016_Public.zip`; the Oct 2016 release is 403.
+- **Downloads:** put them in their own new directory, and run Python that reads them with `-I`.
+- **Git:** a push once failed with 403 and worked on retry. Use the current session's commit trailers.
+- **Context:** keep each context under about 150k tokens; spin up subagents for large chunks of work. The user has given full autonomy and wants steps and findings reported as work proceeds.
+
+## 9. Open items / next steps
+1. Swap in JRC GFC2020 (bit 8) and a current WDPA release when they are reachable or uploaded by the user. Confirm the P-0005/P-0006 overlap against the DNP boundary.
+2. Add real restricted-use areas, e.g. Thai Royal Forest Department National Reserved Forests (not in WDPA).
+3. Add a minimum-area (0.5 ha) or connectivity option for `c2`.
+4. Add GLAD/DIST alerts in spare bits 14–15 for monitoring after 2025.
+5. Use a 2019/2020 plantation map if one becomes available.
+6. Optional: run the overview benefit on a less churned region; polish or publish the report.
