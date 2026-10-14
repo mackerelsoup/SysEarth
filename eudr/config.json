@@ -70,11 +70,12 @@
   "min": 5
  },
  "strict_pa": {
-  "path": "data/layers/protected_areas_overture.geojson",
+  "path": "data/layers/wdpa_mar2016_aoi.geojson",
   "field": "eudr_category",
   "values": [
    "strict"
-  ]
+  ],
+  "note": "WDPA Mar 2016 (UNEP-WCMC archive); IUCN Ia/Ib/II -> strict. OSM/Overture alternative: data/layers/protected_areas_overture.geojson"
  },
  "restricted": {
   "path": "tests/data/synthetic_restricted_areas.geojson",

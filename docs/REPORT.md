@@ -7,7 +7,7 @@ queried quickly, while preserving every plot-level compliance decision?
 
 | | Original layers (COG) | SysEarth cube | Single-regime decision byte |
 |---|---|---|---|
-| Storage (needed layers) | 4.64 MB, 6 rasters + 2 vector files | **1.28 MB** (1.23 MB raster + 42 KB vectors), **3.6× smaller** | **0.28 MB, 16.5× smaller** |
+| Storage (needed layers) | 4.66 MB, 6 rasters + 2 vector files | **1.29 MB** (1.23 MB raster + 49 KB vectors), **3.6× smaller** | **0.29 MB, 16.1× smaller** |
 | Uncompressed | 17.6 MB | 5.0 MB | 2.5 MB |
 | Decision fidelity, 1,005 plots × 4 regimes (`c2`, `d1`, `d2` all match) | reference | **100 %** | 100 % (EUDR only) |
 | Pixel fidelity | reference | 100 % on every field used in decisions; canopy % mean abs. error 10.3 pts | EUDR flags only |
@@ -18,8 +18,9 @@ Reproduce with:
 
 ```bash
 python scripts/fetch_layers.py                 # ancillary layers (GLAD GCS, ESA S3, Overture S3)
+python scripts/fetch_wdpa.py                   # WDPA polygons (UNEP-WCMC archive bucket)
 python scripts/build_cube.py                   # -> data/cube/
-python scripts/make_synthetic_plots.py --pa data/layers/protected_areas_overture.geojson \
+python scripts/make_synthetic_plots.py --pa data/layers/wdpa_mar2016_aoi.geojson \
        tests/data/synthetic_restricted_areas.geojson --n-pa 250
 python scripts/evaluate.py --plots tests/data/17plots-valid.geojson tests/data/synthetic_plots.geojson
 python scripts/bench_http.py --plots tests/data/17plots-valid.geojson --latency-ms 40
@@ -66,7 +67,7 @@ So the cube stores the minimum needed to evaluate that shape for any parameter s
 | 8 | forest 2020 (tree cover ≥ 5 m) | GLAD GLCLU 2020 (JRC GFC2020 drops in) | lossless |
 | 9 | tree height ≥ 5 m | GLAD TCH 2020 | lossless |
 | 10 | tree-crop plantation, **pre cut-off** | GLAD Commodities 2015 | lossless |
-| 11 | strict PA, burned *all-touched* | OSM / Overture (WDPA drops in) | superset, never misses |
+| 11 | strict PA (IUCN Ia/Ib/II), burned *all-touched* | WDPA Mar 2016 (OSM/Overture as cross-check) | superset, never misses |
 | 12 | restricted-use area, *all-touched* | synthetic here | superset, never misses |
 | 13 | not land | Hansen `datamask` | lossless |
 | 14–15 | spare (e.g. post-2025 GLAD/DIST alert flag) | – | – |
@@ -101,7 +102,7 @@ instead of reusing them.
 ### 2.4 Polygon to pixels (one rule for both paths)
 
 - **Which pixels belong to a plot:** those whose pixel centre falls inside the polygon (GDAL default). A plot too small to contain any centre (< ~0.08 ha) falls back to every pixel it touches, so it is never empty. `pixel_rule="all_touched"` is available as a stricter option.
-- **Protected-area overlap:** the plot's touched pixels are tested against the PA bit. A PA bit burned all-touched can only over-cover, so **a miss in the raster is a guaranteed miss**. A hit is confirmed with an exact polygon intersection against the vectors shipped with the cube (42 KB).
+- **Protected-area overlap:** the plot's touched pixels are tested against the PA bit. A PA bit burned all-touched can only over-cover, so **a miss in the raster is a guaranteed miss**. A hit is confirmed with an exact polygon intersection against the vectors shipped with the cube (49 KB).
 
 ### 2.5 Query acceleration and its extra storage
 
@@ -109,8 +110,8 @@ instead of reusing them.
 |---|---|---|
 | Single band instead of 5–6 rasters | –72 % | 1 range request per plot instead of 5–6 (one per layer) |
 | 16 × 16 block overview: OR of flags, max of loss year and canopy class | **+0.5 %** (6.5 KB) | Answers "no indication, no PA" without the full-resolution read, when a plot's blocks have no possible hit |
-| PA vectors (exact) | +3.4 % | Exact `d1`/`d2` with the raster bit as a spatial index |
-| Decision byte (optional, one regime) | +19 % if kept beside the cube, or a 16.5× smaller replacement | Fastest single-regime path |
+| PA vectors (exact) | +4.0 % | Exact `d1`/`d2` with the raster bit as a spatial index |
+| Decision byte (optional, one regime) | +19 % if kept beside the cube, or a 16.1× smaller replacement | Fastest single-regime path |
 
 In this plantation landscape (46 % of pixels lost at some point, 74 % plantation) the overview
 resolves only 2 % of plots, because almost every 480 m block holds some post-2020 loss. In intact-forest or
@@ -141,7 +142,7 @@ cropland regions the share is far higher. The overview costs 0.5 %, so it is kep
 | 138 | centred on post-2020 loss |
 | 250 | on the boundaries of protected and restricted areas |
 
-So every output has positives. Under EUDR: `c2` 238, `d1` 101, `d2` 178.
+So every output has positives. Under EUDR: `c2` 235, `d1` 96, `d2` 180.
 
 ### 4.1 Storage
 
@@ -149,16 +150,16 @@ So every output has positives. Under EUDR: `c2` 238, `d1` 101, `d2` 178.
 |---|---|---|
 | Hansen lossyear + treecover2000 + datamask | 2,016,468 | 0.80 |
 | GLCLU 2020 + TCH 2020 + Commodities 2015 | 2,585,306 | 1.03 |
-| PA vectors | 41,883 | – |
-| **Original, needed** | **4,643,657** | **1.84** |
-| Original, plus dropped `gain` | 4,785,415 | 1.90 |
-| **Cube + overview + vectors** | **1,281,715** | **0.51** |
-| Decision byte + vectors | 280,757 | 0.11 |
+| PA vectors (WDPA + synthetic restricted) | 53,312 | – |
+| **Original, needed** | **4,655,086** | **1.85** |
+| Original, plus dropped `gain` | 4,796,844 | 1.90 |
+| **Cube + overview + vectors** | **1,289,603** | **0.51** |
+| Decision byte + vectors | 288,325 | 0.11 |
 
 Reductions:
 
-- **Cube:** 3.6× against the needed original layers, and 13.8× uncompressed to compressed (17.6 MB to 1.28 MB).
-- **Decision byte:** 16.5×.
+- **Cube:** 3.6× against the needed original layers, and 13.8× uncompressed to compressed (17.6 MB to 1.29 MB).
+- **Decision byte:** 16.1×.
 
 Going further is entropy-bound. The loss year alone is 3.1 bits per pixel in this rotation landscape.
 Collapsing pre-2020 loss into the epochs that bound the supported cut-offs (≤ 2005, 2006–08,
@@ -179,8 +180,8 @@ On local disk both paths are bound by polygon rasterisation, not I/O.
 
 | Regime | Original layers | Cube |
 |---|---|---|
-| EUDR | 5,490 (5 files) | **1,098** |
-| Legacy | 2,196 (2 files) | 1,098 |
+| EUDR | 5,495 (5 files) | **1,099** |
+| Legacy | 2,198 (2 files) | 1,099 |
 
 **Object storage (HTTP range requests through GDAL `/vsicurl/`, 40 ms injected latency), EUDR:**
 
@@ -193,10 +194,10 @@ On local disk both paths are bound by polygon rasterisation, not I/O.
 
 | Regime | Plots | All of `c2`, `d1`, `d2` match | Deforested pixel count matches | Positives `c2` / `d1` / `d2` |
 |---|---|---|---|---|
-| EUDR (baseline + plantation mask) | 1,005 | **100 %** | 100 % | 238 / 101 / 178 |
-| EUDR, Hansen only | 1,005 | **100 %** | 100 % | 548 / 101 / 178 |
-| Legacy (any loss 2021–23) | 1,005 | **100 %** | 100 % | 407 / 101 / 178 |
-| RSPO-style 2005, canopy > 30 % | 1,005 | **100 %** | 100 % | 833 / 101 / 178 |
+| EUDR (baseline + plantation mask) | 1,005 | **100 %** | 100 % | 235 / 96 / 180 |
+| EUDR, Hansen only | 1,005 | **100 %** | 100 % | 548 / 96 / 180 |
+| Legacy (any loss 2021–23) | 1,005 | **100 %** | 100 % | 403 / 96 / 180 |
+| RSPO-style 2005, canopy > 30 % | 1,005 | **100 %** | 100 % | 831 / 96 / 180 |
 | Same, answered from the overview where possible | 1,005 | **100 %** | 100 % | – |
 
 Fidelity is 100 % by construction:
@@ -207,8 +208,8 @@ Fidelity is 100 % by construction:
 
 **Against the existing CSV (17 plots).** The CSV is a different, undocumented process, so this is not a fidelity
 measure. `c2` agrees on 9 of 17 plots under EUDR and under legacy. Under EUDR, the five plots the CSV
-flagged (all cleared on site) are clean. `d1` disagrees on P-0005 and P-0006, which lie inside Khlong
-Phraya WS in OSM (see 01 §1.4).
+flagged (all cleared on site) are clean. `d1` disagrees on P-0005 and P-0006, which overlap Khlong
+Phraya Wildlife Sanctuary in WDPA (32 % and 24 % of plot area) and in OSM (see 01 §1.4).
 
 ### 4.4 Pixel fidelity (cube vs aligned sources, all 2.52 M pixels)
 
@@ -218,7 +219,7 @@ Phraya WS in OSM (see 01 §1.4).
 | canopy class, and `canopy > T` for all 7 thresholds | 100 % |
 | canopy % (reconstructed from the class midpoint) | mean abs. error 10.3 pts, RMSE 13.3 pts (not used by any decision) |
 | forest 2020, height ≥ 5 m, plantation, not-land | 100 % |
-| strict PA bit vs pixel-centre rasterisation of the vectors | 0 pixels missed; 1.7 % extra (boundary pixels, by design) |
+| strict PA bit vs pixel-centre rasterisation of the vectors | 0 pixels missed; 1.8 % extra (boundary pixels, by design) |
 | restricted bit | 0 missed; 2.8 % extra |
 | decision byte vs cube rule | 100 % |
 
@@ -272,9 +273,11 @@ is small either way: a few hundred dollars a year. What the cube changes:
 
 ## 6. Limitations and next steps
 
-1. **JRC GFC2020 and WDPA could not be downloaded** from this sandbox (egress policy). GLAD
-   GLCLU 2020 and OSM via Overture stand in. Both drop into `eudr/config.json` unchanged:
-   GFC2020 sets bit 8, WDPA sets bits 11–12.
+1. **JRC GFC2020 could not be downloaded** from this sandbox (egress policy), so GLAD GLCLU 2020
+   stands in and GFC2020 drops into `eudr/config.json` unchanged (bit 8). **WDPA is the March 2016
+   release**: Protected Planet is blocked, but UNEP-WCMC's public archive bucket is not, and its newest
+   readable release is from 2016. All three PAs here were designated between 1980 and 1998, but a
+   current release should replace it (`scripts/fetch_wdpa.py`, one line).
 2. **Restricted-use areas are synthetic.** National Reserved Forests (Thai RFD) are the obvious
    real source.
 3. **Plantation map is from 2015.** Plantations established 2016–2020 are not in it. They are

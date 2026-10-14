@@ -20,21 +20,21 @@
    "height": 1051611
   },
   "pa_vector_bytes": {
-   "strict_pa": 38036,
+   "strict_pa": 49465,
    "restricted": 3847
   },
-  "original_total_bytes": 4785415,
-  "original_needed_bytes": 4643657,
-  "original_native_total_bytes": 4785415,
+  "original_total_bytes": 4796844,
+  "original_needed_bytes": 4655086,
+  "original_native_total_bytes": 4796844,
   "original_uncompressed_bytes": 17640462,
-  "cube_bytes": 1233486,
+  "cube_bytes": 1234160,
   "cube_uncompressed_bytes": 5040132,
-  "overview_bytes": 6464,
-  "decision_byte_bytes": 238992,
-  "cube_vectors_bytes": 41765,
-  "reduction_vs_original_needed": 3.64,
-  "reduction_vs_original_total": 3.75,
-  "reduction_vs_native_total": 3.75,
+  "overview_bytes": 6450,
+  "decision_byte_bytes": 239332,
+  "cube_vectors_bytes": 48993,
+  "reduction_vs_original_needed": 3.63,
+  "reduction_vs_original_total": 3.74,
+  "reduction_vs_native_total": 3.74,
   "overview_extra_pct": 0.52
  },
  "decisions": {
@@ -52,9 +52,9 @@
     "mismatches": []
    },
    "positives_original": {
-    "c2_indication": 238,
-    "d1_strict_pa": 101,
-    "d2_restricted": 178
+    "c2_indication": 235,
+    "d1_strict_pa": 96,
+    "d2_restricted": 180
    },
    "positives_by_kind": {
     "real": {
@@ -66,20 +66,20 @@
     "random": {
      "n": 600,
      "c2_indication": 120,
-     "d1_strict_pa": 62,
+     "d1_strict_pa": 59,
      "d2_restricted": 11
     },
     "post2020_loss": {
      "n": 138,
      "c2_indication": 62,
-     "d1_strict_pa": 6,
+     "d1_strict_pa": 8,
      "d2_restricted": 2
     },
     "pa_boundary": {
      "n": 250,
-     "c2_indication": 53,
-     "d1_strict_pa": 31,
-     "d2_restricted": 165
+     "c2_indication": 50,
+     "d1_strict_pa": 27,
+     "d2_restricted": 167
     }
    }
   },
@@ -98,8 +98,8 @@
    },
    "positives_original": {
     "c2_indication": 548,
-    "d1_strict_pa": 101,
-    "d2_restricted": 178
+    "d1_strict_pa": 96,
+    "d2_restricted": 180
    },
    "positives_by_kind": {
     "real": {
@@ -111,20 +111,20 @@
     "random": {
      "n": 600,
      "c2_indication": 298,
-     "d1_strict_pa": 62,
+     "d1_strict_pa": 59,
      "d2_restricted": 11
     },
     "post2020_loss": {
      "n": 138,
      "c2_indication": 134,
-     "d1_strict_pa": 6,
+     "d1_strict_pa": 8,
      "d2_restricted": 2
     },
     "pa_boundary": {
      "n": 250,
      "c2_indication": 109,
-     "d1_strict_pa": 31,
-     "d2_restricted": 165
+     "d1_strict_pa": 27,
+     "d2_restricted": 167
     }
    }
   },
@@ -142,9 +142,9 @@
     "mismatches": []
    },
    "positives_original": {
-    "c2_indication": 407,
-    "d1_strict_pa": 101,
-    "d2_restricted": 178
+    "c2_indication": 403,
+    "d1_strict_pa": 96,
+    "d2_restricted": 180
    },
    "positives_by_kind": {
     "real": {
@@ -156,20 +156,20 @@
     "random": {
      "n": 600,
      "c2_indication": 209,
-     "d1_strict_pa": 62,
+     "d1_strict_pa": 59,
      "d2_restricted": 11
     },
     "post2020_loss": {
      "n": 138,
      "c2_indication": 105,
-     "d1_strict_pa": 6,
+     "d1_strict_pa": 8,
      "d2_restricted": 2
     },
     "pa_boundary": {
      "n": 250,
-     "c2_indication": 90,
-     "d1_strict_pa": 31,
-     "d2_restricted": 165
+     "c2_indication": 86,
+     "d1_strict_pa": 27,
+     "d2_restricted": 167
     }
    }
   },
@@ -187,9 +187,9 @@
     "mismatches": []
    },
    "positives_original": {
-    "c2_indication": 833,
-    "d1_strict_pa": 101,
-    "d2_restricted": 178
+    "c2_indication": 831,
+    "d1_strict_pa": 96,
+    "d2_restricted": 180
    },
    "positives_by_kind": {
     "real": {
@@ -201,20 +201,20 @@
     "random": {
      "n": 600,
      "c2_indication": 478,
-     "d1_strict_pa": 62,
+     "d1_strict_pa": 59,
      "d2_restricted": 11
     },
     "post2020_loss": {
      "n": 138,
      "c2_indication": 135,
-     "d1_strict_pa": 6,
+     "d1_strict_pa": 8,
      "d2_restricted": 2
     },
     "pa_boundary": {
      "n": 250,
-     "c2_indication": 206,
-     "d1_strict_pa": 31,
-     "d2_restricted": 165
+     "c2_indication": 204,
+     "d1_strict_pa": 27,
+     "d2_restricted": 167
     }
    }
   }
@@ -222,109 +222,109 @@
  "query": {
   "eudr": {
    "original": {
-    "median_ms_per_plot": 1.087,
-    "mean_ms_per_plot": 1.15,
+    "median_ms_per_plot": 1.181,
+    "mean_ms_per_plot": 1.257,
     "window_reads": 5025,
-    "pixels_decoded": 1188450,
+    "pixels_decoded": 1189070,
     "plots_answered_from_overview": 0,
-    "cog_range_requests": 5490
+    "cog_range_requests": 5495
    },
    "cube": {
-    "median_ms_per_plot": 0.946,
-    "mean_ms_per_plot": 1.118,
+    "median_ms_per_plot": 1.021,
+    "mean_ms_per_plot": 1.161,
     "window_reads": 1005,
-    "pixels_decoded": 237690,
+    "pixels_decoded": 237814,
     "plots_answered_from_overview": 0,
-    "cog_range_requests": 1098
+    "cog_range_requests": 1099
    },
    "cube+overview": {
-    "median_ms_per_plot": 0.861,
-    "mean_ms_per_plot": 1.061,
+    "median_ms_per_plot": 0.941,
+    "mean_ms_per_plot": 1.101,
     "window_reads": 985,
-    "pixels_decoded": 235707,
+    "pixels_decoded": 235831,
     "plots_answered_from_overview": 20,
-    "cog_range_requests": 1078
+    "cog_range_requests": 1079
    },
    "files_per_query_original": 5
   },
   "eudr_hansen_only": {
    "original": {
-    "median_ms_per_plot": 0.963,
-    "mean_ms_per_plot": 1.004,
+    "median_ms_per_plot": 0.837,
+    "mean_ms_per_plot": 0.868,
     "window_reads": 3015,
-    "pixels_decoded": 713070,
+    "pixels_decoded": 713442,
     "plots_answered_from_overview": 0,
-    "cog_range_requests": 3294
+    "cog_range_requests": 3297
    },
    "cube": {
-    "median_ms_per_plot": 0.899,
-    "mean_ms_per_plot": 1.027,
+    "median_ms_per_plot": 0.877,
+    "mean_ms_per_plot": 1.03,
     "window_reads": 1005,
-    "pixels_decoded": 237690,
+    "pixels_decoded": 237814,
     "plots_answered_from_overview": 0,
-    "cog_range_requests": 1098
+    "cog_range_requests": 1099
    },
    "cube+overview": {
-    "median_ms_per_plot": 0.921,
-    "mean_ms_per_plot": 1.087,
+    "median_ms_per_plot": 0.841,
+    "mean_ms_per_plot": 1.024,
     "window_reads": 985,
-    "pixels_decoded": 235707,
+    "pixels_decoded": 235831,
     "plots_answered_from_overview": 20,
-    "cog_range_requests": 1078
+    "cog_range_requests": 1079
    },
    "files_per_query_original": 3
   },
   "legacy": {
    "original": {
-    "median_ms_per_plot": 0.887,
-    "mean_ms_per_plot": 0.913,
+    "median_ms_per_plot": 0.924,
+    "mean_ms_per_plot": 0.968,
     "window_reads": 2010,
-    "pixels_decoded": 475380,
+    "pixels_decoded": 475628,
     "plots_answered_from_overview": 0,
-    "cog_range_requests": 2196
+    "cog_range_requests": 2198
    },
    "cube": {
-    "median_ms_per_plot": 0.832,
-    "mean_ms_per_plot": 1.073,
+    "median_ms_per_plot": 0.992,
+    "mean_ms_per_plot": 1.107,
     "window_reads": 1005,
-    "pixels_decoded": 237690,
+    "pixels_decoded": 237814,
     "plots_answered_from_overview": 0,
-    "cog_range_requests": 1098
+    "cog_range_requests": 1099
    },
    "cube+overview": {
-    "median_ms_per_plot": 0.858,
-    "mean_ms_per_plot": 1.026,
+    "median_ms_per_plot": 0.755,
+    "mean_ms_per_plot": 0.985,
     "window_reads": 985,
-    "pixels_decoded": 235707,
+    "pixels_decoded": 235831,
     "plots_answered_from_overview": 20,
-    "cog_range_requests": 1078
+    "cog_range_requests": 1079
    },
    "files_per_query_original": 2
   },
   "rspo": {
    "original": {
-    "median_ms_per_plot": 0.897,
-    "mean_ms_per_plot": 0.926,
+    "median_ms_per_plot": 0.937,
+    "mean_ms_per_plot": 0.958,
     "window_reads": 3015,
-    "pixels_decoded": 713070,
+    "pixels_decoded": 713442,
     "plots_answered_from_overview": 0,
-    "cog_range_requests": 3294
+    "cog_range_requests": 3297
    },
    "cube": {
-    "median_ms_per_plot": 0.886,
-    "mean_ms_per_plot": 1.01,
+    "median_ms_per_plot": 0.851,
+    "mean_ms_per_plot": 0.982,
     "window_reads": 1005,
-    "pixels_decoded": 237690,
+    "pixels_decoded": 237814,
     "plots_answered_from_overview": 0,
-    "cog_range_requests": 1098
+    "cog_range_requests": 1099
    },
    "cube+overview": {
-    "median_ms_per_plot": 0.927,
-    "mean_ms_per_plot": 1.053,
+    "median_ms_per_plot": 0.93,
+    "mean_ms_per_plot": 1.078,
     "window_reads": 1004,
-    "pixels_decoded": 237648,
+    "pixels_decoded": 237772,
     "plots_answered_from_overview": 1,
-    "cog_range_requests": 1097
+    "cog_range_requests": 1098
    },
    "files_per_query_original": 3
   }
@@ -783,8 +783,8 @@
   "plantation_exact_pct": 100.0,
   "plantation_share_pct": 73.738,
   "height5m_exact_pct": 100.0,
-  "strict_pa_px_flagged": 217387,
-  "strict_pa_px_centre_inside": 213814,
+  "strict_pa_px_flagged": 213470,
+  "strict_pa_px_centre_inside": 209734,
   "strict_pa_missed_px": 0,
   "restricted_px_flagged": 58006,
   "restricted_px_centre_inside": 56421,

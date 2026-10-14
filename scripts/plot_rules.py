@@ -41,6 +41,6 @@ for a, (t, d, f) in zip(ax, panels):
     a.set_xlim(ext[0], ext[1])
     a.set_ylim(ext[2], ext[3])
 fig.text(0.5, 0.01, "red = loss / deforestation after 31 Dec 2020 | green = forest at cut-off under the rule | "
-         "purple = strict protected areas (OSM) | black = the 17 plots", ha="center")
+         "purple = strict protected areas (WDPA) | black = the 17 plots", ha="center")
 plt.tight_layout(rect=[0, 0.03, 1, 1])
 plt.savefig("docs/img/rules_compared.png", dpi=110)

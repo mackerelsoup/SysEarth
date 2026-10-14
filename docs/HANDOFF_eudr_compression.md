@@ -67,13 +67,13 @@ All five deliverables are drafted. See **docs/REPORT.md** (main report) and docs
 - `lossyear` covers 2001-2025 (v1.13). The EUDR window is 2021-2025; the legacy rule is 2021-2023.
 - The CSV `c2` cannot be reproduced by any Hansen rule, so fidelity is measured against the original layers.
 - Layers come from GLAD GCS, ESA S3 and Overture S3; JRC, WDPA and Zenodo are blocked. See data/layers/PROVENANCE.md and scripts/fetch_layers.py.
-- Config: eudr/config.json. Forest 2020 = GLCLU 2020 classes 27-48 and 127-148. Plantation = GLAD Commodities **2015** classes 2 and 4. TCH >= 5 m. PA = OSM via Overture (3 strict). Restricted areas are synthetic.
+- Config: eudr/config.json. Forest 2020 = GLCLU 2020 classes 27-48 and 127-148. Plantation = GLAD Commodities **2015** classes 2 and 4. TCH >= 5 m. PA = WDPA Mar 2016 from the UNEP-WCMC archive bucket s3://wdpa via scripts/fetch_wdpa.py (3 strict); OSM via Overture is a cross-check. Restricted areas are synthetic.
 - Results: decision fidelity 100% on 1,005 plots x 4 regimes. The cube is 3.6x smaller than the needed originals and the decision byte 16.5x. Over HTTP at 40 ms latency: 72 -> 19 ms per plot.
-- Findings: P-0005 and P-0006 lie inside Khlong Phraya WS (OSM), but the CSV says no overlap. 22% of strict-PA pixels are 2015 plantation. Under EUDR, the 5 CSV-flagged plots are clean, and P-0001, P-0014 and P-0016 have 1-10 deforested px.
+- Findings: P-0005 and P-0006 overlap Khlong Phraya WS (WDPA 32%/24%, OSM 100%), but the CSV says no overlap. 22% of strict-PA pixels are 2015 plantation. Under EUDR, the 5 CSV-flagged plots are clean, and P-0001, P-0014 and P-0016 have 1-10 deforested px.
 - The venv must be recreated per session: `pip install rasterio shapely pyproj numpy matplotlib pyarrow`.
 
 ## Open items / next steps
-1. Swap in JRC GFC2020 and WDPA when they can be downloaded, and check the P-0005/P-0006 overlap against WDPA.
+1. Swap in JRC GFC2020 and a current WDPA release when they can be downloaded (the archive's newest is 2016), and confirm the P-0005/P-0006 overlap with the DNP boundary.
 2. Use real restricted-use areas (Thai RFD National Reserved Forests).
 3. Add a minimum-area (0.5 ha) or connectivity option for `c2`; add GLAD/DIST alerts in spare bits 14-15.
 4. Use a 2019/2020 plantation map if one becomes available.
