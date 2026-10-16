@@ -127,6 +127,8 @@ $PY scripts/evaluate.py --plots tests/data/17plots-valid.geojson tests/data/synt
 $PY scripts/bench_http.py --plots tests/data/17plots-valid.geojson --latency-ms 40 --out data/cube/http_bench_17plots.json
 $PY scripts/bench_http.py --plots tests/data/17plots-valid.geojson --latency-ms 40 --regime eudr_patch05ha --out data/cube/http_bench_17plots_patch05ha.json
 $PY scripts/plot_rules.py            # docs/img/rules_compared.png
+$PY scripts/plot_figures.py          # docs/img/bit_layout.png, docs/img/results.png
+$PY scripts/make_map_page.py         # docs/map/cube_explorer.html (published: https://claude.ai/artifact/KZDwuLywBfVPbB46hfPB4h)
 ```
 
 **Code map**
@@ -156,4 +158,4 @@ $PY scripts/plot_rules.py            # docs/img/rules_compared.png
 4. Add GLAD/DIST alerts in spare bits 14–15 for monitoring after 2025.
 5. Use a 2019/2020 plantation map if one becomes available.
 6. Confirm with the user the commodity in scope and how the CSV's `c2` was produced.
-7. Optional: polish or publish the report.
+7. Done: figures `bit_layout.png` and `results.png` in the report; interactive explorer published at https://claude.ai/artifact/KZDwuLywBfVPbB46hfPB4h (private; republish from `docs/map/cube_explorer.html`).

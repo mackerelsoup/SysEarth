@@ -3,6 +3,8 @@
 **Question.** Can multiple geospatial layers across time and space be encoded compactly and
 queried quickly, while preserving every plot-level compliance decision?
 
+**Interactive explorer:** [Surat Thani Cube Explorer](https://claude.ai/artifact/KZDwuLywBfVPbB46hfPB4h) (private until shared; source `docs/map/cube_explorer.html`). Switch rules, decode any square, compare the 17 plots with the CSV.
+
 **Answer, on a 44 × 44 km clip of Surat Thani, Thailand (2.52 M pixels at 30 m):**
 
 | | Original layers (COG) | SysEarth cube | Single-regime decision byte |
@@ -85,6 +87,8 @@ So the cube stores the minimum needed to evaluate that shape for any parameter s
 | 13 | not land | Hansen `datamask` | lossless |
 | 14–15 | spare (e.g. post-2025 GLAD/DIST alert flag) | – | – |
 
+![Bit layout: which source layer goes into which bits](img/bit_layout.png)
+
 Stored as a single-band, 256 × 256 tiled, deflate Cloud-Optimized GeoTIFF on the Hansen grid.
 Zstd saves another 3 %, and two uint8 bands save 12 %. Deflate was kept for compatibility.
 
@@ -154,6 +158,8 @@ landscape (46 % of pixels lost at some point, 74 % plantation) the overview answ
 | `scripts/bench_http.py` | serves files over HTTP with injected latency, counts real range requests via GDAL `/vsicurl/` |
 | `scripts/align_to_hansen.py` | aggregates a finer raster (JRC GFC2020, 10 m) to % of selected classes per Hansen pixel |
 | `scripts/make_synthetic_plots.py` | random, post-2020-loss, PA-boundary and EUDR-deforested plots (`--cube`, `--n-defor`) |
+| `scripts/plot_figures.py` | `docs/img/bit_layout.png` and `docs/img/results.png`, from the evaluation JSON |
+| `scripts/make_map_page.py` | builds the interactive explorer `docs/map/cube_explorer.html` from `docs/map/template.html` (embeds the whole cube) |
 | `scripts/fetch_layers.py` | reproducible acquisition and clipping of ancillary layers ([PROVENANCE](../data/layers/PROVENANCE.md)) |
 
 ## 4. Evaluation
@@ -170,6 +176,8 @@ landscape (46 % of pixels lost at some point, 74 % plantation) the overview answ
 
 So every output has positives. Under EUDR: `c2` 82, `d1` 103, `d2` 186. The JRC baseline leaves so
 few deforested pixels that the `eudr_deforested` group is needed to test `c2`; 77 of its 88 plots get an indication.
+
+![Results: storage, query time, file reads and decision fidelity](img/results.png)
 
 ### 4.1 Storage
 

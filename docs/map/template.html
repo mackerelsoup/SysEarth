@@ -1,0 +1,591 @@
+<title>Surat Thani Cube Explorer</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..100,500..800&family=Public+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: a field-survey sheet. Map on the left as the main exhibit, a narrow
+   instrument column on the right (rule, legend, inspector), the plot register below. */
+:root {
+  --bg: #f3f4f1;
+  --paper: #fbfbf9;
+  --ink: #15201b;
+  --ink-2: #4a5550;
+  --muted: #7d8782;
+  --line: #d9ddd8;
+  --accent: #1f5f4a;
+  --accent-ink: #ffffff;
+  --accent-soft: #dcebe4;
+  /* map classes */
+  --m-land: #e7e5dc;
+  --m-water: #b9d3e6;
+  --m-forest: #7fb08a;
+  --m-defor: #d6352b;
+  --m-small: #f0a03c;
+  --m-loss: #c9b89a;
+  --m-strict: #5b3fb8;
+  --m-restr: #c2408a;
+  --m-plot: #10140f;
+  --flag-bg: #fbe3df;
+  --flag-ink: #9b1c13;
+  --clear-bg: #e3efe6;
+  --clear-ink: #24583a;
+  --f-display: "Archivo", "Arial Narrow", system-ui, sans-serif;
+  --f-body: "Public Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #121714; --paper: #19201c; --ink: #e8ece9; --ink-2: #b4bdb8; --muted: #86918b; --line: #2e3833;
+    --accent: #6cc3a1; --accent-ink: #0d1a14; --accent-soft: #1f3a2f;
+    --m-land: #2a2f2b; --m-water: #23415a; --m-forest: #3f7a53; --m-defor: #ff5a4a; --m-small: #f2a646;
+    --m-loss: #6b604e; --m-strict: #b49cff; --m-restr: #f07ab8; --m-plot: #f4f6f2;
+    --flag-bg: #4a1f1a; --flag-ink: #ffb4a8; --clear-bg: #1d3427; --clear-ink: #9fd8b2;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #121714; --paper: #19201c; --ink: #e8ece9; --ink-2: #b4bdb8; --muted: #86918b; --line: #2e3833;
+  --accent: #6cc3a1; --accent-ink: #0d1a14; --accent-soft: #1f3a2f;
+  --m-land: #2a2f2b; --m-water: #23415a; --m-forest: #3f7a53; --m-defor: #ff5a4a; --m-small: #f2a646;
+  --m-loss: #6b604e; --m-strict: #b49cff; --m-restr: #f07ab8; --m-plot: #f4f6f2;
+  --flag-bg: #4a1f1a; --flag-ink: #ffb4a8; --clear-bg: #1d3427; --clear-ink: #9fd8b2;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  background: var(--bg); color: var(--ink); font-family: var(--f-body); font-size: 15px; line-height: 1.5;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 28px 48px;
+}
+.wrap { max-width: 1240px; margin: 0 auto; display: flex; flex-direction: column; gap: 28px; }
+h1, h2, h3 { font-family: var(--f-display); font-stretch: 85%; margin: 0; text-wrap: balance; letter-spacing: -0.01em; }
+h1 { font-size: clamp(30px, 4.2vw, 46px); font-weight: 800; line-height: 1.05; }
+h2 { font-size: 22px; font-weight: 700; }
+h3 { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink-2); font-stretch: 100%; }
+p { margin: 0; }
+.eyebrow { font-family: var(--f-mono); font-size: 12px; color: var(--muted); letter-spacing: 0.04em; }
+header { display: flex; flex-direction: column; gap: 10px; }
+.lede { max-width: 70ch; color: var(--ink-2); font-size: 16px; }
+.lede b { color: var(--ink); font-weight: 600; }
+
+/* rule picker */
+.rules { display: flex; flex-wrap: wrap; gap: 8px; }
+.rules button {
+  font: 600 14px/1.2 var(--f-body); color: var(--ink); background: var(--paper); border: 1px solid var(--line);
+  border-radius: 999px; padding: 9px 15px; cursor: pointer; display: flex; gap: 8px; align-items: baseline;
+}
+.rules button small { font: 400 12px var(--f-mono); color: var(--muted); }
+.rules button:hover { border-color: var(--accent); }
+.rules button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.rules button[aria-pressed="true"] small { color: var(--accent-ink); opacity: 0.8; }
+button:focus-visible, .zoom button:focus-visible, tr:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.main { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 24px; align-items: start; }
+@media (max-width: 920px) { .main { grid-template-columns: minmax(0, 1fr); } }
+
+.mapbox { position: relative; background: var(--paper); border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+.mapbox canvas { display: block; width: 100%; aspect-ratio: 1597 / 1578; max-width: 100%; touch-action: none; cursor: crosshair; }
+.mapbox canvas.dragging { cursor: grabbing; }
+.zoom { position: absolute; top: 10px; right: 10px; display: flex; flex-direction: column; gap: 4px; }
+.zoom button { width: 34px; height: 34px; border-radius: 4px; border: 1px solid var(--line); background: var(--paper); color: var(--ink);
+  font: 600 17px var(--f-mono); cursor: pointer; }
+.zoom button.reset { font-size: 11px; }
+.status { position: absolute; left: 10px; bottom: 10px; font: 12px var(--f-mono); color: var(--ink-2); background: var(--paper);
+  border: 1px solid var(--line); border-radius: 4px; padding: 4px 8px; }
+.scale { position: absolute; right: 10px; bottom: 10px; font: 11px var(--f-mono); color: var(--ink-2); background: var(--paper);
+  border: 1px solid var(--line); border-radius: 4px; padding: 4px 8px; display: flex; align-items: center; gap: 6px; }
+.scale i { display: inline-block; height: 4px; border: 1px solid var(--ink-2); border-top: 0; }
+
+.side { display: flex; flex-direction: column; gap: 18px; min-width: 0; }
+.panel { background: var(--paper); border: 1px solid var(--line); border-radius: 6px; padding: 16px; display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.rule-desc { color: var(--ink-2); font-size: 14px; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { font: 12px var(--f-mono); padding: 3px 8px; border-radius: 4px; background: var(--bg); border: 1px solid var(--line); color: var(--ink-2); }
+.chip.off { text-decoration: line-through; color: var(--muted); }
+.stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.stat b { display: block; font: 700 24px/1.1 var(--f-display); font-stretch: 85%; font-variant-numeric: tabular-nums; }
+.stat span { font-size: 12px; color: var(--muted); }
+.legend { display: grid; grid-template-columns: 1fr; gap: 6px; font-size: 13px; color: var(--ink-2); }
+.legend div { display: flex; align-items: center; gap: 8px; }
+.sw { width: 14px; height: 14px; border-radius: 3px; flex: none; border: 1px solid var(--line); }
+.sw.line { height: 0; border: 0; border-top: 2px solid; border-radius: 0; }
+.sw.dash { height: 0; border: 0; border-top: 2px dashed; border-radius: 0; }
+.legend .hide { display: none; }
+
+.bits { display: grid; grid-template-columns: repeat(16, minmax(0, 1fr)); gap: 2px; }
+.bits div { font: 600 12px var(--f-mono); text-align: center; padding: 5px 0 3px; border-radius: 3px; background: var(--bg); color: var(--muted); border-bottom: 3px solid var(--line); }
+.bits div.on { color: var(--ink); }
+.bits div sub { display: block; font: 9px var(--f-mono); color: var(--muted); }
+.kv { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 4px 12px; font-size: 13px; }
+.kv dt { color: var(--muted); }
+.kv dd { margin: 0; font-variant-numeric: tabular-nums; }
+.verdicts { display: flex; flex-direction: column; gap: 4px; font-size: 13px; }
+.verdicts div { display: flex; justify-content: space-between; gap: 8px; }
+.verdicts div.active { font-weight: 600; }
+.hint { font-size: 13px; color: var(--muted); }
+.mono { font-family: var(--f-mono); }
+
+.pill { display: inline-flex; align-items: center; gap: 5px; font: 600 12px var(--f-body); padding: 2px 8px; border-radius: 999px; white-space: nowrap; }
+.pill.flag { background: var(--flag-bg); color: var(--flag-ink); }
+.pill.clear { background: var(--clear-bg); color: var(--clear-ink); }
+.pill.flag::before { content: "●"; font-size: 8px; }
+.pill.clear::before { content: "○"; font-size: 8px; }
+.pill .n { font: 400 11px var(--f-mono); opacity: 0.85; }
+
+.register { display: flex; flex-direction: column; gap: 12px; }
+.register p { color: var(--ink-2); max-width: 75ch; }
+.tablewrap { overflow-x: auto; background: var(--paper); border: 1px solid var(--line); border-radius: 6px; }
+table { border-collapse: collapse; width: 100%; font-size: 13px; min-width: 860px; }
+th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); vertical-align: middle; white-space: nowrap; }
+th { font: 600 12px var(--f-body); color: var(--ink-2); background: var(--bg); position: sticky; top: 0; }
+td.num { font-variant-numeric: tabular-nums; font-family: var(--f-mono); }
+th.active, td.active { background: var(--accent-soft); }
+tbody tr { cursor: pointer; }
+tbody tr:hover td { background: var(--bg); }
+tbody tr.sel td { box-shadow: inset 0 2px 0 var(--accent), inset 0 -2px 0 var(--accent); }
+tbody tr:last-child td { border-bottom: 0; }
+
+.notes { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
+@media (max-width: 820px) { .notes { grid-template-columns: minmax(0, 1fr); } }
+.notes div { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.notes p { color: var(--ink-2); font-size: 14px; }
+.big { font: 700 28px/1 var(--f-display); font-stretch: 85%; color: var(--ink); font-variant-numeric: tabular-nums; }
+footer { font-size: 12px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 14px; }
+@media (prefers-reduced-motion: no-preference) { .rules button { transition: background .15s, color .15s, border-color .15s; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">SYSEARTH · EUDR CUBE · 44 × 44 KM · SURAT THANI / KRABI, THAILAND</div>
+    <h1>Surat Thani Cube Explorer</h1>
+    <p class="lede">Every 30 m square below is <b>one 16-bit number</b> that packs seven source maps (tree loss year, tree cover, the EU 2020 forest map, tree height, plantations, protected areas, land/water). Pick a rule and the page applies it to those numbers in your browser. <b>Click anywhere</b> to decode a square, or click a plot to see its answers.</p>
+  </header>
+
+  <div class="rules" id="rules" role="group" aria-label="Compliance rule"></div>
+
+  <div class="main">
+    <div class="mapbox">
+      <canvas id="map" aria-label="Map of the cube under the selected rule"></canvas>
+      <div class="zoom">
+        <button id="zin" aria-label="Zoom in">+</button>
+        <button id="zout" aria-label="Zoom out">−</button>
+        <button id="zreset" class="reset" aria-label="Show whole area">ALL</button>
+      </div>
+      <div class="status" id="status">Decoding cube…</div>
+      <div class="scale" id="scale"><i id="scalebar"></i><span id="scaletxt"></span></div>
+    </div>
+
+    <aside class="side">
+      <section class="panel" aria-labelledby="rule-h">
+        <h3 id="rule-h">Rule applied</h3>
+        <h2 id="rule-name"></h2>
+        <p class="rule-desc" id="rule-desc"></p>
+        <div class="chips" id="rule-chips"></div>
+        <div class="stats">
+          <div class="stat"><b id="s-defor">–</b><span>of the area counted as deforested</span></div>
+          <div class="stat"><b id="s-forest">–</b><span>forest at the cut-off</span></div>
+          <div class="stat"><b id="s-real">–</b><span>real plots flagged (of 17)</span></div>
+          <div class="stat"><b id="s-all">–</b><span>test plots flagged (of 1,093)</span></div>
+        </div>
+      </section>
+
+      <section class="panel" aria-labelledby="leg-h">
+        <h3 id="leg-h">Legend</h3>
+        <div class="legend">
+          <div><span class="sw" style="background:var(--m-defor)"></span>Deforested after the cut-off (counts for c2)</div>
+          <div id="leg-small"><span class="sw" style="background:var(--m-small)"></span>Deforested, but patch under 0.5 ha (not counted)</div>
+          <div id="leg-forest"><span class="sw" style="background:var(--m-forest)"></span>Forest at the cut-off, still standing</div>
+          <div id="leg-loss"><span class="sw" style="background:var(--m-loss)"></span>Tree loss after the cut-off that is not deforestation under this rule</div>
+          <div><span class="sw" style="background:var(--m-water)"></span>Water / no data</div>
+          <div><span class="sw line" style="border-color:var(--m-strict)"></span>Strict protected area (WDPA)</div>
+          <div><span class="sw dash" style="border-color:var(--m-restr)"></span>Restricted-use area (synthetic test data)</div>
+          <div><span class="sw line" style="border-color:var(--m-plot)"></span>The 17 real plots</div>
+        </div>
+      </section>
+
+      <section class="panel" aria-labelledby="ins-h" aria-live="polite">
+        <h3 id="ins-h">Inspector</h3>
+        <div id="inspector"><p class="hint">Click the map to decode a square.</p></div>
+      </section>
+    </aside>
+  </div>
+
+  <section class="register" aria-labelledby="reg-h">
+    <h2 id="reg-h">The 17 real plots: c2 under each rule</h2>
+    <p>Each cell is the cube's answer for deforestation (c2), with the number of deforested 30 m squares inside the plot. The highlighted column is the rule on the map. Click a row to find the plot on the map. "d1" is overlap with a strict protected area.</p>
+    <div class="tablewrap"><table id="tbl"></table></div>
+  </section>
+
+  <section class="notes">
+    <div><h3>Storage</h3><div class="big" id="n-store"></div><p id="n-store-t"></p></div>
+    <div><h3>Same answers</h3><div class="big">100 %</div><p>Across 1,093 test plots and all five rules, the cube gives exactly the answers the original separate layers give (c2, d1 and d2).</p></div>
+    <div><h3>One file, any rule</h3><div class="big">0 bytes</div><p>Extra data needed to switch rules. Every rule above reads the same numbers; only the question changes.</p></div>
+  </section>
+
+  <footer>Sources: Hansen GFC-2025 v1.13 (loss year, tree cover 2000, land mask), JRC GFC2020 V4 (EU forest 2020), GLAD tree height 2020, GLAD Commodities 2015, WDPA/WD-OECM Oct 2026 (Thailand). Restricted-use areas are synthetic test polygons. Plot answers come from the project's cube query engine (eudr/query.py); the map applies the same rules in the browser.</footer>
+</div>
+
+<script>
+const DATA = /*__DATA__*/null;
+const EDGES = [0, 10, 15, 20, 25, 30, 50, 100];
+const NAMES = {
+  eudr: ["EUDR", "default"], eudr_patch05ha: ["EUDR, ≥ 0.5 ha", "patch rule"],
+  eudr_hansen_only: ["Hansen only", "no EU map"], legacy: ["Legacy", "the CSV's rule"], rspo: ["RSPO", "2005 cut-off"],
+};
+const DESC = {
+  eudr: "Forest at the end of 2020 on the EU's JRC map, with canopy over 10 % and not a 2015 plantation, then lost in 2021–2025.",
+  eudr_patch05ha: "As EUDR, but only connected cleared patches of at least 7 squares (0.5 ha) count. Smaller fragments are shown in orange.",
+  eudr_hansen_only: "Canopy over 10 % in 2000 and still standing at the end of 2020, then lost in 2021–2025. Ignores the EU forest map and plantations, so plantation felling counts.",
+  legacy: "Any Hansen tree loss in 2021–2023 on land, forest or not. This is the rule the CSV says it used.",
+  rspo: "Canopy over 30 % in 2000, still standing at the end of 2005, then lost in 2006–2025. The 2020 EU map and 2015 plantations would post-date this cut-off, so they are off.",
+};
+const FIELDS = [ // [first bit, last bit, label, css colour var]
+  [0, 4, "loss year", "--m-defor"], [5, 7, "canopy", "--accent"], [8, 8, "forest 2020", "--m-forest"],
+  [9, 9, "≥ 5 m", "--m-forest"], [10, 10, "plantation", "--m-small"], [11, 11, "strict PA", "--m-strict"],
+  [12, 12, "restricted", "--m-restr"], [13, 13, "not land", "--m-water"], [14, 15, "spare", "--line"],
+];
+const RKEYS = Object.keys(DATA.regimes);
+let current = "eudr";
+let cube = null, patchKeep = null, img = null, imgCtx = null;
+const W = DATA.w, H = DATA.h, [LEFT, BOTTOM, RIGHT, TOP] = DATA.bounds;
+const DX = (RIGHT - LEFT) / W, DY = (TOP - BOTTOM) / H;
+
+// ---------- rules (mirror of eudr/rules.py) ----------
+const canopyAbove = t => { let i = 0; while (i < EDGES.length && EDGES[i] < t) i++; return i + 1; };
+function makeRule(r) {
+  const lo = r.cutoff_year + 1 - 2000, hi = r.loss_end_year - 2000, ca = canopyAbove(r.canopy_threshold);
+  const forest = v => {
+    const ly = v & 31, notLand = (v >> 13) & 1;
+    if (!r.require_forest) return !notLand;
+    if (((v >> 5) & 7) < ca || notLand) return false;
+    if (!(ly === 0 || ly >= lo)) return false;
+    if (r.use_baseline && !((v >> 8) & 1)) return false;
+    if (r.use_height && !((v >> 9) & 1)) return false;
+    if (r.exclude_plantation && ((v >> 10) & 1)) return false;
+    return true;
+  };
+  const after = v => { const ly = v & 31; return ly >= lo && ly <= hi; };
+  return { ...r, lo, hi, forest, after, defor: v => forest(v) && after(v) };
+}
+const RULES = Object.fromEntries(RKEYS.map(k => [k, makeRule(DATA.regimes[k])]));
+
+// connected patches (8-neighbour) of the deforested mask over the whole area; mirrors large_patches()
+function patches(rule) {
+  const n = W * H, lab = new Int32Array(n).fill(-1), keep = new Uint8Array(n), stack = [];
+  for (let i = 0; i < n; i++) {
+    if (lab[i] !== -1 || !rule.defor(cube[i])) continue;
+    const members = []; let edge = false; stack.push(i); lab[i] = i;
+    while (stack.length) {
+      const j = stack.pop(); members.push(j);
+      const y = (j / W) | 0, x = j - y * W;
+      if (x === 0 || y === 0 || x === W - 1 || y === H - 1) edge = true;
+      for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) {
+        const yy = y + dy, xx = x + dx;
+        if ((dx || dy) && yy >= 0 && yy < H && xx >= 0 && xx < W) {
+          const k = yy * W + xx;
+          if (lab[k] === -1 && rule.defor(cube[k])) { lab[k] = i; stack.push(k); }
+        }
+      }
+    }
+    const ok = edge || members.length >= rule.min_patch_px;
+    for (const j of members) keep[j] = ok ? 1 : 0;
+  }
+  return keep;
+}
+
+// ---------- colours ----------
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+function rgb(hex) { const h = hex.replace("#", ""); return [0, 2, 4].map(i => parseInt(h.slice(i, i + 2), 16)); }
+let COL = {};
+function readColours() {
+  for (const k of ["land", "water", "forest", "defor", "small", "loss", "strict", "restr", "plot"]) COL[k] = css("--m-" + k);
+}
+
+// ---------- render the cube under the current rule ----------
+function renderImage() {
+  const rule = RULES[current], data = imgCtx.createImageData(W, H), px = data.data;
+  const c = Object.fromEntries(["land", "water", "forest", "defor", "small", "loss"].map(k => [k, rgb(COL[k])]));
+  const showForest = rule.require_forest;
+  let nDef = 0, nForest = 0;
+  for (let i = 0; i < W * H; i++) {
+    const v = cube[i]; let col;
+    if ((v >> 13) & 1) col = c.water;
+    else if (rule.defor(v)) {
+      if (rule.min_patch_px > 0 && !patchKeep[i]) col = c.small; else { col = c.defor; nDef++; }
+    } else if (rule.after(v)) col = c.loss;
+    else if (showForest && rule.forest(v)) col = c.forest;
+    else col = c.land;
+    if (showForest && rule.forest(v)) nForest++;
+    const o = i * 4; px[o] = col[0]; px[o + 1] = col[1]; px[o + 2] = col[2]; px[o + 3] = 255;
+  }
+  imgCtx.putImageData(data, 0, 0);
+  const pct = x => (100 * x / (W * H));
+  document.getElementById("s-defor").textContent = pct(nDef).toFixed(pct(nDef) < 1 ? 3 : 1) + " %";
+  document.getElementById("s-forest").textContent = showForest ? pct(nForest).toFixed(1) + " %" : "n/a";
+}
+
+// ---------- map view ----------
+const canvas = document.getElementById("map"), ctx = canvas.getContext("2d");
+let view = { s: 1, x: 0, y: 0 }; // screen = (pixel * s) + offset, in CSS px
+function fit() { const r = canvas.getBoundingClientRect(); view = { s: r.width / W, x: 0, y: 0 }; }
+function resize() {
+  const r = canvas.getBoundingClientRect(), dpr = window.devicePixelRatio || 1;
+  const keep = view.s && canvas._w ? r.width / canvas._w : 1;
+  canvas.width = Math.round(r.width * dpr); canvas.height = Math.round(r.height * dpr); canvas._w = r.width;
+  view.s *= keep; view.x *= keep; view.y *= keep;
+  draw();
+}
+const geoToPx = ([lon, lat]) => [(lon - LEFT) / DX, (TOP - lat) / DY];
+function rings(g) { return g.type === "Polygon" ? [g.coordinates] : g.coordinates; }
+function pathGeom(g) {
+  ctx.beginPath();
+  for (const poly of rings(g)) for (const ring of poly) ring.forEach((p, i) => {
+    const [x, y] = geoToPx(p), sx = x * view.s + view.x, sy = y * view.s + view.y;
+    i ? ctx.lineTo(sx, sy) : ctx.moveTo(sx, sy);
+  });
+}
+let selPlot = null, selPx = null;
+function draw() {
+  const dpr = window.devicePixelRatio || 1;
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.fillStyle = css("--paper"); ctx.fillRect(0, 0, canvas.width, canvas.height);
+  if (!img) return;
+  ctx.imageSmoothingEnabled = false;
+  ctx.drawImage(img, view.x, view.y, W * view.s, H * view.s);
+  ctx.lineJoin = "round";
+  for (const p of DATA.restricted) { pathGeom(p.geom); ctx.setLineDash([5, 4]); ctx.strokeStyle = COL.restr; ctx.lineWidth = 1.6; ctx.stroke(); }
+  ctx.setLineDash([]);
+  for (const p of DATA.strict) { pathGeom(p.geom); ctx.strokeStyle = COL.strict; ctx.lineWidth = 2; ctx.stroke(); }
+  for (const p of DATA.plots) {
+    pathGeom(p.geom);
+    const a = p.ans[current];
+    if (a.c2) { ctx.fillStyle = COL.defor + "40"; ctx.fill(); }
+    ctx.strokeStyle = COL.plot; ctx.lineWidth = p === selPlot ? 3 : 1.4; ctx.stroke();
+  }
+  if (view.s > 3) {
+    ctx.font = "600 11px " + css("--f-mono");
+    for (const p of DATA.plots) {
+      const [x, y] = geoToPx(rings(p.geom)[0][0][0]);
+      const sx = x * view.s + view.x, sy = y * view.s + view.y - 6;
+      ctx.lineWidth = 3; ctx.strokeStyle = css("--paper"); ctx.strokeText(p.id, sx, sy);
+      ctx.fillStyle = COL.plot; ctx.fillText(p.id, sx, sy);
+    }
+  }
+  if (selPx) {
+    const [cx, cy] = selPx, s = view.s, x = cx * s + view.x, y = cy * s + view.y, d = Math.max(s, 8);
+    ctx.strokeStyle = COL.plot; ctx.lineWidth = 2; ctx.strokeRect(x + s / 2 - d / 2, y + s / 2 - d / 2, d, d);
+  }
+  // scale bar: 1 km
+  const mPerPx = 27.6, kmPx = 1000 / mPerPx * view.s;
+  let km = 1; while (km * kmPx < 50) km *= 2; while (km * kmPx > 140 && km > 0.25) km /= 2;
+  document.getElementById("scalebar").style.width = (km * kmPx).toFixed(0) + "px";
+  document.getElementById("scaletxt").textContent = km + " km";
+}
+function zoomAt(f, sx, sy) {
+  const r = canvas.getBoundingClientRect(), min = r.width / W, max = min * 60;
+  const ns = Math.min(max, Math.max(min, view.s * f)); f = ns / view.s;
+  view.x = sx - (sx - view.x) * f; view.y = sy - (sy - view.y) * f; view.s = ns;
+  clamp(); draw();
+}
+function clamp() {
+  const r = canvas.getBoundingClientRect(), w = W * view.s, h = H * view.s;
+  view.x = Math.min(0, Math.max(r.width - w, view.x)); view.y = Math.min(0, Math.max(r.height - h, view.y));
+}
+canvas.addEventListener("wheel", e => {
+  e.preventDefault(); const r = canvas.getBoundingClientRect();
+  zoomAt(Math.exp(-e.deltaY * 0.0015), e.clientX - r.left, e.clientY - r.top);
+}, { passive: false });
+let drag = null; const pointers = new Map();
+canvas.addEventListener("pointerdown", e => {
+  canvas.setPointerCapture(e.pointerId); pointers.set(e.pointerId, [e.clientX, e.clientY]);
+  drag = { x: e.clientX, y: e.clientY, vx: view.x, vy: view.y, moved: false, pinch: pointers.size === 2 ? pinchDist() : null, s0: view.s };
+});
+function pinchDist() { const [a, b] = [...pointers.values()]; return Math.hypot(a[0] - b[0], a[1] - b[1]); }
+canvas.addEventListener("pointermove", e => {
+  if (!drag) return; pointers.set(e.pointerId, [e.clientX, e.clientY]);
+  if (pointers.size === 2 && drag.pinch) {
+    const r = canvas.getBoundingClientRect(), [a, b] = [...pointers.values()];
+    zoomAt(drag.s0 * pinchDist() / drag.pinch / view.s, (a[0] + b[0]) / 2 - r.left, (a[1] + b[1]) / 2 - r.top);
+    drag.moved = true; return;
+  }
+  const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+  if (Math.abs(dx) + Math.abs(dy) > 4) { drag.moved = true; canvas.classList.add("dragging"); }
+  if (drag.moved) { view.x = drag.vx + dx; view.y = drag.vy + dy; clamp(); draw(); }
+});
+canvas.addEventListener("pointerup", e => {
+  pointers.delete(e.pointerId); canvas.classList.remove("dragging");
+  if (drag && !drag.moved && cube) { const r = canvas.getBoundingClientRect(); clickAt(e.clientX - r.left, e.clientY - r.top); }
+  if (pointers.size === 0) drag = null;
+});
+canvas.addEventListener("pointercancel", e => { pointers.delete(e.pointerId); drag = null; });
+document.getElementById("zin").onclick = () => { const r = canvas.getBoundingClientRect(); zoomAt(1.8, r.width / 2, r.height / 2); };
+document.getElementById("zout").onclick = () => { const r = canvas.getBoundingClientRect(); zoomAt(1 / 1.8, r.width / 2, r.height / 2); };
+document.getElementById("zreset").onclick = () => { fit(); draw(); };
+
+function inRing(x, y, ring) {
+  let ins = false;
+  for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+    const [xi, yi] = ring[i], [xj, yj] = ring[j];
+    if ((yi > y) !== (yj > y) && x < (xj - xi) * (y - yi) / (yj - yi) + xi) ins = !ins;
+  }
+  return ins;
+}
+function inGeom(lon, lat, g) {
+  return rings(g).some(poly => inRing(lon, lat, poly[0]) && !poly.slice(1).some(h => inRing(lon, lat, h)));
+}
+function clickAt(sx, sy) {
+  const cx = Math.floor((sx - view.x) / view.s), cy = Math.floor((sy - view.y) / view.s);
+  if (cx < 0 || cy < 0 || cx >= W || cy >= H) return;
+  const lon = LEFT + (cx + 0.5) * DX, lat = TOP - (cy + 0.5) * DY;
+  selPx = [cx, cy];
+  selPlot = DATA.plots.find(p => inGeom(lon, lat, p.geom)) || null;
+  inspect(cx, cy); highlightRow(); draw();
+}
+
+// ---------- inspector ----------
+function pill(flag, n) {
+  return `<span class="pill ${flag ? "flag" : "clear"}">${flag ? "Flagged" : "Clear"}${n != null && n > 0 ? ` <span class="n">${n} px</span>` : ""}</span>`;
+}
+function inspect(cx, cy) {
+  const v = cube[cy * W + cx], ly = v & 31, cc = (v >> 5) & 7, bit = b => (v >> b) & 1;
+  const lon = LEFT + (cx + 0.5) * DX, lat = TOP - (cy + 0.5) * DY;
+  let cells = "";
+  for (const [b0, b1, lab, col] of FIELDS) for (let b = b0; b <= b1; b++)
+    cells += `<div class="${bit(b) ? "on" : ""}" style="border-bottom-color:var(${col})" title="bit ${b}: ${lab}">${bit(b)}<sub>${b}</sub></div>`;
+  const yn = b => bit(b) ? "yes" : "no";
+  const inStrict = DATA.strict.find(p => inGeom(lon, lat, p.geom)), inRestr = DATA.restricted.find(p => inGeom(lon, lat, p.geom));
+  const verdict = k => {
+    const r = RULES[k];
+    let s = r.defor(v) ? (r.min_patch_px > 0 && !patchKeep[cy * W + cx] ? "Deforested, patch < 0.5 ha" : "Deforested")
+      : r.after(v) ? "Loss, not counted" : (r.require_forest && r.forest(v)) ? "Forest, standing" : "Not forest";
+    return `<div class="${k === current ? "active" : ""}"><span>${NAMES[k][0]}</span><span>${s}</span></div>`;
+  };
+  const counted = RKEYS.map(verdict).join("");
+  let plotHtml = "";
+  if (selPlot) {
+    const a = selPlot.ans[current];
+    plotHtml = `<h3 style="margin-top:6px">Plot ${selPlot.id} · ${selPlot.area_ha} ha</h3>
+      <dl class="kv"><dt>c2 (${NAMES[current][0]})</dt><dd>${pill(a.c2, a.px)}</dd>
+      <dt>c2 in the CSV</dt><dd>${pill(selPlot.csv.c2)}</dd>
+      <dt>d1 strict PA</dt><dd>${a.d1 ? '<span class="pill flag">Overlap</span>' : '<span class="pill clear">No overlap</span>'} <span class="hint">CSV: ${selPlot.csv.d1 ? "overlap" : "no overlap"}</span></dd>
+      <dt>d2 restricted</dt><dd>${a.d2 ? '<span class="pill flag">Overlap</span>' : '<span class="pill clear">No overlap</span>'}</dd></dl>`;
+  }
+  document.getElementById("inspector").innerHTML = `
+    <p class="mono" style="font-size:13px">Square ${cx}, ${cy} · ${lat.toFixed(5)}° N, ${lon.toFixed(5)}° E</p>
+    <p style="font-size:14px">Stored value <b class="mono">${v}</b></p>
+    <div class="bits" aria-label="The 16 bits, bit 0 first">${cells}</div>
+    <dl class="kv">
+      <dt>Loss year</dt><dd>${ly ? 2000 + ly : "never lost"}</dd>
+      <dt>Canopy 2000</dt><dd>${cc === 0 ? "0 %" : `${EDGES[cc - 1] + 1}–${EDGES[cc]} %`} <span class="hint">(class ${cc})</span></dd>
+      <dt>Forest 2020 (EU)</dt><dd>${yn(8)}</dd><dt>Trees ≥ 5 m</dt><dd>${yn(9)}</dd>
+      <dt>Plantation 2015</dt><dd>${yn(10)}</dd>
+      <dt>Strict PA</dt><dd>${yn(11)}${inStrict ? ` · ${inStrict.name} (IUCN ${inStrict.iucn})` : bit(11) ? " · edge square" : ""}</dd>
+      <dt>Restricted use</dt><dd>${yn(12)}${inRestr ? " · synthetic area" : ""}</dd>
+      <dt>Land</dt><dd>${bit(13) ? "no (water / no data)" : "yes"}</dd>
+    </dl>
+    <h3 style="margin-top:6px">This square under each rule</h3>
+    <div class="verdicts">${counted}</div>${plotHtml}`;
+}
+
+// ---------- rule picker, side panel, table ----------
+function chips(r) {
+  const c = [
+    [`cut-off ${r.cutoff_year}`, true], [`loss to ${r.loss_end_year}`, true],
+    [`canopy > ${r.canopy_threshold} %`, r.require_forest], ["EU forest map", r.use_baseline],
+    ["no plantations", r.exclude_plantation], [`patch ≥ ${r.min_patch_px} px`, r.min_patch_px > 0],
+  ];
+  return c.map(([t, on]) => `<span class="chip ${on ? "" : "off"}">${t}</span>`).join("");
+}
+function selectRule(k) {
+  current = k;
+  for (const b of document.querySelectorAll("#rules button")) b.setAttribute("aria-pressed", b.dataset.k === k);
+  const r = DATA.regimes[k];
+  document.getElementById("rule-name").textContent = NAMES[k][0];
+  document.getElementById("rule-desc").textContent = DESC[k];
+  document.getElementById("rule-chips").innerHTML = chips(r);
+  document.getElementById("s-real").textContent = DATA.plots.filter(p => p.ans[k].c2).length;
+  document.getElementById("s-all").textContent = r.c2_of_1093.toLocaleString("en");
+  document.getElementById("leg-small").classList.toggle("hide", !(r.min_patch_px > 0));
+  document.getElementById("leg-forest").classList.toggle("hide", !r.require_forest);
+  buildTable();
+  if (cube) {
+    renderImage(); draw();
+    if (selPx) inspect(...selPx);
+  }
+}
+document.getElementById("rules").innerHTML = RKEYS.map(k =>
+  `<button data-k="${k}" aria-pressed="false">${NAMES[k][0]} <small>${NAMES[k][1]}</small></button>`).join("");
+for (const b of document.querySelectorAll("#rules button")) b.onclick = () => selectRule(b.dataset.k);
+
+function buildTable() {
+  const head = `<thead><tr><th>Plot</th><th>Area</th><th>CSV c2</th>${RKEYS.map(k =>
+    `<th class="${k === current ? "active" : ""}">${NAMES[k][0]}</th>`).join("")}<th>d1 (cube)</th><th>d1 (CSV)</th></tr></thead>`;
+  const body = DATA.plots.map((p, i) => `<tr data-i="${i}" tabindex="0" class="${p === selPlot ? "sel" : ""}">
+    <td class="mono">${p.id}</td><td class="num">${p.area_ha} ha</td><td>${pill(p.csv.c2)}</td>
+    ${RKEYS.map(k => `<td class="${k === current ? "active" : ""}">${pill(p.ans[k].c2, p.ans[k].px)}</td>`).join("")}
+    <td>${p.ans.eudr.d1 ? '<span class="pill flag">Overlap</span>' : '<span class="pill clear">None</span>'}</td>
+    <td>${p.csv.d1 ? '<span class="pill flag">Overlap</span>' : '<span class="pill clear">None</span>'}</td></tr>`).join("");
+  const t = document.getElementById("tbl"); t.innerHTML = head + "<tbody>" + body + "</tbody>";
+  for (const tr of t.querySelectorAll("tbody tr")) {
+    const go = () => focusPlot(DATA.plots[+tr.dataset.i]);
+    tr.onclick = go; tr.onkeydown = e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); go(); } };
+  }
+}
+function highlightRow() {
+  for (const tr of document.querySelectorAll("#tbl tbody tr")) tr.classList.toggle("sel", DATA.plots[+tr.dataset.i] === selPlot);
+}
+function plotPixels(p) { // pixel centres inside the plot (falls back to the centroid square)
+  const pts = rings(p.geom)[0][0]; let x0 = 1e9, x1 = -1e9, y0 = 1e9, y1 = -1e9;
+  for (const q of pts) { const [x, y] = geoToPx(q); x0 = Math.min(x0, x); x1 = Math.max(x1, x); y0 = Math.min(y0, y); y1 = Math.max(y1, y); }
+  const out = [];
+  for (let y = Math.floor(y0); y <= Math.ceil(y1); y++) for (let x = Math.floor(x0); x <= Math.ceil(x1); x++)
+    if (x >= 0 && y >= 0 && x < W && y < H && inGeom(LEFT + (x + 0.5) * DX, TOP - (y + 0.5) * DY, p.geom)) out.push([x, y]);
+  return { out, box: [x0, y0, x1, y1] };
+}
+function focusPlot(p, quiet) {
+  selPlot = p;
+  const { out, box } = plotPixels(p), r = canvas.getBoundingClientRect();
+  const rule = RULES[current];
+  const hit = out.find(([x, y]) => rule.defor(cube[y * W + x])) || out[Math.floor(out.length / 2)] || [Math.round(box[0]), Math.round(box[1])];
+  selPx = hit;
+  const s = Math.min(r.width / W * 60, Math.min(r.width, r.height) / (Math.max(box[2] - box[0], box[3] - box[1]) * 4));
+  view.s = Math.max(r.width / W, s);
+  view.x = r.width / 2 - (box[0] + box[2]) / 2 * view.s; view.y = r.height / 2 - (box[1] + box[3]) / 2 * view.s;
+  clamp(); inspect(...hit); highlightRow(); draw();
+  if (!quiet) canvas.scrollIntoView({ block: "nearest", behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+}
+
+// ---------- notes ----------
+const mb = b => (b / 1e6).toFixed(2) + " MB";
+document.getElementById("n-store").textContent = `${mb(DATA.storage.original)} → ${mb(DATA.storage.cube)}`;
+document.getElementById("n-store-t").textContent = `The seven source layers against the cube with its overview and protected-area polygons: ${(DATA.storage.original / DATA.storage.cube).toFixed(1)}× smaller. This page carries the whole cube.`;
+
+// ---------- boot ----------
+async function decode() {
+  const bin = atob(DATA.cube), bytes = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+  const stream = new Blob([bytes]).stream().pipeThrough(new DecompressionStream("deflate"));
+  return new Uint16Array(await new Response(stream).arrayBuffer());
+}
+readColours();
+selectRule("eudr");
+requestAnimationFrame(() => { fit(); resize(); });
+new ResizeObserver(() => resize()).observe(canvas);
+const retheme = () => { readColours(); if (cube) { renderImage(); draw(); } };
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change", retheme);
+new MutationObserver(retheme).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+decode().then(c => {
+  cube = c;
+  patchKeep = patches(RULES.eudr_patch05ha);
+  img = document.createElement("canvas"); img.width = W; img.height = H; imgCtx = img.getContext("2d");
+  renderImage();
+  document.getElementById("status").textContent = `${(W * H / 1e6).toFixed(2)} M squares · 30 m · drag to pan, scroll to zoom`;
+  focusPlot(DATA.plots.find(p => p.id === "P-0001"), true);
+  fit(); draw();   // open on the whole area; the inspector keeps P-0001
+}).catch(err => {
+  document.getElementById("status").textContent = "This browser could not decode the cube (needs DecompressionStream): " + err.message;
+});
+</script>
