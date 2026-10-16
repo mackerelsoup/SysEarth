@@ -10,12 +10,12 @@
    "gain": 141758
   },
   "ancillary_on_grid_bytes": {
-   "forest2020": 1159566,
+   "forest2020": 48060,
    "plantation": 374129,
    "height": 1051611
   },
   "ancillary_native_bytes": {
-   "forest2020": 1159566,
+   "forest2020": 118426,
    "plantation": 374129,
    "height": 1051611
   },
@@ -23,83 +23,89 @@
    "strict_pa": 34760,
    "restricted": 3847
   },
-  "original_total_bytes": 4782139,
-  "original_needed_bytes": 4640381,
-  "original_native_total_bytes": 4782139,
+  "original_total_bytes": 3670633,
+  "original_needed_bytes": 3528875,
+  "original_native_total_bytes": 3740999,
   "original_uncompressed_bytes": 17640462,
-  "cube_bytes": 1232852,
+  "cube_bytes": 1126706,
   "cube_uncompressed_bytes": 5040132,
-  "overview_bytes": 6414,
-  "decision_byte_bytes": 238350,
+  "overview_bytes": 7172,
+  "decision_byte_bytes": 154825,
   "cube_vectors_bytes": 35516,
-  "reduction_vs_original_needed": 3.66,
-  "reduction_vs_original_total": 3.77,
-  "reduction_vs_native_total": 3.77,
-  "overview_extra_pct": 0.52
+  "reduction_vs_original_needed": 3.04,
+  "reduction_vs_original_total": 3.16,
+  "reduction_vs_native_total": 3.22,
+  "overview_extra_pct": 0.64
  },
  "decisions": {
   "eudr": {
    "cube": {
-    "plots": 1005,
+    "plots": 1093,
     "all_outputs_match_pct": 100.0,
     "deforested_px_match_pct": 100.0,
     "mismatches": []
    },
    "cube+overview": {
-    "plots": 1005,
+    "plots": 1093,
     "all_outputs_match_pct": 100.0,
     "deforested_px_match_pct": 100.0,
     "mismatches": []
    },
    "positives_original": {
-    "c2_indication": 237,
-    "d1_strict_pa": 93,
-    "d2_restricted": 182
+    "c2_indication": 82,
+    "d1_strict_pa": 103,
+    "d2_restricted": 186
    },
    "positives_by_kind": {
     "real": {
      "n": 17,
-     "c2_indication": 3,
+     "c2_indication": 1,
      "d1_strict_pa": 2,
      "d2_restricted": 0
     },
     "random": {
      "n": 600,
-     "c2_indication": 120,
+     "c2_indication": 2,
      "d1_strict_pa": 58,
      "d2_restricted": 11
     },
     "post2020_loss": {
      "n": 138,
-     "c2_indication": 62,
+     "c2_indication": 1,
      "d1_strict_pa": 8,
      "d2_restricted": 2
     },
     "pa_boundary": {
      "n": 250,
-     "c2_indication": 52,
+     "c2_indication": 1,
      "d1_strict_pa": 25,
      "d2_restricted": 169
+    },
+    "eudr_deforested": {
+     "n": 88,
+     "c2_indication": 77,
+     "d1_strict_pa": 10,
+     "d2_restricted": 4
     }
    }
   },
   "eudr_hansen_only": {
    "cube": {
-    "plots": 1005,
+    "plots": 1093,
     "all_outputs_match_pct": 100.0,
     "deforested_px_match_pct": 100.0,
     "mismatches": []
    },
    "cube+overview": {
-    "plots": 1005,
+    "plots": 1093,
     "all_outputs_match_pct": 100.0,
     "deforested_px_match_pct": 100.0,
     "mismatches": []
    },
    "positives_original": {
-    "c2_indication": 550,
-    "d1_strict_pa": 93,
-    "d2_restricted": 182
+    "c2_indication": 632,
+    "d1_strict_pa": 103,
+    "d2_restricted": 186
    },
    "positives_by_kind": {
     "real": {
@@ -125,26 +131,32 @@
      "c2_indication": 111,
      "d1_strict_pa": 25,
      "d2_restricted": 169
+    },
+    "eudr_deforested": {
+     "n": 88,
+     "c2_indication": 82,
+     "d1_strict_pa": 10,
+     "d2_restricted": 4
     }
    }
   },
   "legacy": {
    "cube": {
-    "plots": 1005,
+    "plots": 1093,
     "all_outputs_match_pct": 100.0,
     "deforested_px_match_pct": 100.0,
     "mismatches": []
    },
    "cube+overview": {
-    "plots": 1005,
+    "plots": 1093,
     "all_outputs_match_pct": 100.0,
     "deforested_px_match_pct": 100.0,
     "mismatches": []
    },
    "positives_original": {
-    "c2_indication": 405,
-    "d1_strict_pa": 93,
-    "d2_restricted": 182
+    "c2_indication": 459,
+    "d1_strict_pa": 103,
+    "d2_restricted": 186
    },
    "positives_by_kind": {
     "real": {
@@ -170,26 +182,32 @@
      "c2_indication": 88,
      "d1_strict_pa": 25,
      "d2_restricted": 169
+    },
+    "eudr_deforested": {
+     "n": 88,
+     "c2_indication": 54,
+     "d1_strict_pa": 10,
+     "d2_restricted": 4
     }
    }
   },
   "rspo": {
    "cube": {
-    "plots": 1005,
+    "plots": 1093,
     "all_outputs_match_pct": 100.0,
     "deforested_px_match_pct": 100.0,
     "mismatches": []
    },
    "cube+overview": {
-    "plots": 1005,
+    "plots": 1093,
     "all_outputs_match_pct": 100.0,
     "deforested_px_match_pct": 100.0,
     "mismatches": []
    },
    "positives_original": {
-    "c2_indication": 828,
-    "d1_strict_pa": 93,
-    "d2_restricted": 182
+    "c2_indication": 913,
+    "d1_strict_pa": 103,
+    "d2_restricted": 186
    },
    "positives_by_kind": {
     "real": {
@@ -215,6 +233,12 @@
      "c2_indication": 201,
      "d1_strict_pa": 25,
      "d2_restricted": 169
+    },
+    "eudr_deforested": {
+     "n": 88,
+     "c2_indication": 85,
+     "d1_strict_pa": 10,
+     "d2_restricted": 4
     }
    }
   }
@@ -222,123 +246,123 @@
  "query": {
   "eudr": {
    "original": {
-    "median_ms_per_plot": 1.106,
-    "mean_ms_per_plot": 1.155,
-    "window_reads": 5025,
-    "pixels_decoded": 1193445,
+    "median_ms_per_plot": 1.219,
+    "mean_ms_per_plot": 1.261,
+    "window_reads": 5465,
+    "pixels_decoded": 1291270,
     "plots_answered_from_overview": 0,
-    "cog_range_requests": 5495
+    "cog_range_requests": 6005
    },
    "cube": {
-    "median_ms_per_plot": 1.015,
-    "mean_ms_per_plot": 1.062,
-    "window_reads": 1005,
-    "pixels_decoded": 238689,
+    "median_ms_per_plot": 0.967,
+    "mean_ms_per_plot": 1.121,
+    "window_reads": 1093,
+    "pixels_decoded": 258254,
     "plots_answered_from_overview": 0,
-    "cog_range_requests": 1099
+    "cog_range_requests": 1201
    },
    "cube+overview": {
-    "median_ms_per_plot": 0.883,
-    "mean_ms_per_plot": 1.017,
-    "window_reads": 985,
-    "pixels_decoded": 236706,
-    "plots_answered_from_overview": 20,
-    "cog_range_requests": 1079
+    "median_ms_per_plot": 0.227,
+    "mean_ms_per_plot": 0.796,
+    "window_reads": 507,
+    "pixels_decoded": 123407,
+    "plots_answered_from_overview": 586,
+    "cog_range_requests": 557
    },
    "files_per_query_original": 5
   },
   "eudr_hansen_only": {
    "original": {
-    "median_ms_per_plot": 0.892,
-    "mean_ms_per_plot": 0.929,
-    "window_reads": 3015,
-    "pixels_decoded": 716067,
+    "median_ms_per_plot": 0.998,
+    "mean_ms_per_plot": 1.037,
+    "window_reads": 3279,
+    "pixels_decoded": 774762,
     "plots_answered_from_overview": 0,
-    "cog_range_requests": 3297
+    "cog_range_requests": 3603
    },
    "cube": {
-    "median_ms_per_plot": 0.871,
-    "mean_ms_per_plot": 1.022,
-    "window_reads": 1005,
-    "pixels_decoded": 238689,
+    "median_ms_per_plot": 0.823,
+    "mean_ms_per_plot": 1.003,
+    "window_reads": 1093,
+    "pixels_decoded": 258254,
     "plots_answered_from_overview": 0,
-    "cog_range_requests": 1099
+    "cog_range_requests": 1201
    },
    "cube+overview": {
-    "median_ms_per_plot": 0.877,
-    "mean_ms_per_plot": 1.045,
-    "window_reads": 985,
-    "pixels_decoded": 236706,
+    "median_ms_per_plot": 0.874,
+    "mean_ms_per_plot": 1.044,
+    "window_reads": 1073,
+    "pixels_decoded": 256271,
     "plots_answered_from_overview": 20,
-    "cog_range_requests": 1079
+    "cog_range_requests": 1181
    },
    "files_per_query_original": 3
   },
   "legacy": {
    "original": {
-    "median_ms_per_plot": 0.831,
-    "mean_ms_per_plot": 0.862,
-    "window_reads": 2010,
-    "pixels_decoded": 477378,
+    "median_ms_per_plot": 0.889,
+    "mean_ms_per_plot": 0.903,
+    "window_reads": 2186,
+    "pixels_decoded": 516508,
     "plots_answered_from_overview": 0,
-    "cog_range_requests": 2198
+    "cog_range_requests": 2402
    },
    "cube": {
-    "median_ms_per_plot": 0.771,
-    "mean_ms_per_plot": 0.929,
-    "window_reads": 1005,
-    "pixels_decoded": 238689,
+    "median_ms_per_plot": 0.887,
+    "mean_ms_per_plot": 1.011,
+    "window_reads": 1093,
+    "pixels_decoded": 258254,
     "plots_answered_from_overview": 0,
-    "cog_range_requests": 1099
+    "cog_range_requests": 1201
    },
    "cube+overview": {
-    "median_ms_per_plot": 0.737,
-    "mean_ms_per_plot": 0.904,
-    "window_reads": 985,
-    "pixels_decoded": 236706,
+    "median_ms_per_plot": 0.816,
+    "mean_ms_per_plot": 0.973,
+    "window_reads": 1073,
+    "pixels_decoded": 256271,
     "plots_answered_from_overview": 20,
-    "cog_range_requests": 1079
+    "cog_range_requests": 1181
    },
    "files_per_query_original": 2
   },
   "rspo": {
    "original": {
-    "median_ms_per_plot": 0.9,
-    "mean_ms_per_plot": 0.946,
-    "window_reads": 3015,
-    "pixels_decoded": 716067,
+    "median_ms_per_plot": 0.992,
+    "mean_ms_per_plot": 1.008,
+    "window_reads": 3279,
+    "pixels_decoded": 774762,
     "plots_answered_from_overview": 0,
-    "cog_range_requests": 3297
+    "cog_range_requests": 3603
    },
    "cube": {
-    "median_ms_per_plot": 0.847,
-    "mean_ms_per_plot": 1.013,
-    "window_reads": 1005,
-    "pixels_decoded": 238689,
+    "median_ms_per_plot": 0.906,
+    "mean_ms_per_plot": 1.029,
+    "window_reads": 1093,
+    "pixels_decoded": 258254,
     "plots_answered_from_overview": 0,
-    "cog_range_requests": 1099
+    "cog_range_requests": 1201
    },
    "cube+overview": {
-    "median_ms_per_plot": 0.863,
-    "mean_ms_per_plot": 1.038,
-    "window_reads": 1004,
-    "pixels_decoded": 238647,
+    "median_ms_per_plot": 0.842,
+    "mean_ms_per_plot": 1.005,
+    "window_reads": 1092,
+    "pixels_decoded": 258212,
     "plots_answered_from_overview": 1,
-    "cog_range_requests": 1098
+    "cog_range_requests": 1200
    },
    "files_per_query_original": 3
   }
  },
  "report_csv": {
   "eudr": {
-   "c2_agree": 9,
+   "c2_agree": 11,
    "of": 17,
    "rows": [
     {
      "plot": "P-0001",
      "csv_flag": false,
      "ours": true,
-     "def_px": 10
+     "def_px": 1
     },
     {
      "plot": "P-0003",
@@ -397,8 +421,8 @@
     {
      "plot": "P-0014",
      "csv_flag": false,
-     "ours": true,
-     "def_px": 2
+     "ours": false,
+     "def_px": 0
     },
     {
      "plot": "P-0015",
@@ -409,8 +433,8 @@
     {
      "plot": "P-0016",
      "csv_flag": false,
-     "ours": true,
-     "def_px": 1
+     "ours": false,
+     "def_px": 0
     },
     {
      "plot": "P-0017",
@@ -779,7 +803,7 @@
   "canopy_class_exact_pct": 100.0,
   "not_land_exact_pct": 100.0,
   "forest2020_exact_pct": 100.0,
-  "forest2020_share_pct": 82.603,
+  "forest2020_share_pct": 8.865,
   "plantation_exact_pct": 100.0,
   "plantation_share_pct": 73.738,
   "height5m_exact_pct": 100.0,
@@ -790,8 +814,8 @@
   "restricted_px_centre_inside": 56421,
   "restricted_missed_px": 0,
   "decision_byte_matches_cube_pct": 100.0,
-  "eudr_forest2020_share_pct": 14.653,
-  "eudr_deforested_share_pct": 0.917,
+  "eudr_forest2020_share_pct": 8.294,
+  "eudr_deforested_share_pct": 0.027,
   "hansen_only_forest2020_share_pct": 53.598,
   "hansen_only_deforested_share_pct": 10.194
  }

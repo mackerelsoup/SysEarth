@@ -1,2 +1,4 @@
 data/layers/glad_*_clip.tif
 __pycache__/
+data/layers/clip_bbox.json
+data/layers/clip_area.geojson

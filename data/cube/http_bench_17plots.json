@@ -4,26 +4,26 @@
  "regime": "eudr",
  "original": {
   "open_requests": 23,
-  "open_s": 0.995,
-  "query_requests": 28,
-  "bytes": 1210286,
-  "total_s": 2.208,
-  "ms_per_plot": 71.39
+  "open_s": 0.999,
+  "query_requests": 22,
+  "bytes": 885212,
+  "total_s": 1.997,
+  "ms_per_plot": 58.74
  },
  "cube": {
   "open_requests": 3,
-  "open_s": 0.128,
+  "open_s": 0.13,
   "query_requests": 7,
-  "bytes": 360448,
-  "total_s": 0.446,
-  "ms_per_plot": 18.71
+  "bytes": 376832,
+  "total_s": 0.467,
+  "ms_per_plot": 19.81
  },
  "cube+overview": {
   "open_requests": 6,
-  "open_s": 0.255,
-  "query_requests": 7,
-  "bytes": 366862,
-  "total_s": 0.585,
-  "ms_per_plot": 19.44
+  "open_s": 0.257,
+  "query_requests": 2,
+  "bytes": 138244,
+  "total_s": 0.352,
+  "ms_per_plot": 5.6
  }
 }

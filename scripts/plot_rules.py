@@ -21,7 +21,7 @@ b = s.bounds
 ext = [b.left, b.right, b.bottom, b.top]
 panels = [("Legacy: any Hansen loss 2021-2023", R.LEGACY.lost_after_cutoff(c) & ~E.flag(c, "not_land"), None),
           ("EUDR, Hansen only: canopy 2000 >10%, lost 2021-2025", R.EUDR_HANSEN_ONLY.deforested(c), R.EUDR_HANSEN_ONLY.forest_mask(c)),
-          ("EUDR: + GLCLU 2020 forest, - 2015 plantations", R.EUDR.deforested(c), R.EUDR.forest_mask(c))]
+          ("EUDR: JRC GFC2020 forest, - 2015 plantations", R.EUDR.deforested(c), R.EUDR.forest_mask(c))]
 plots = [shape(f["geometry"]) for f in json.load(open("tests/data/17plots-valid.geojson"))["features"]]
 pas = [shape(f["geometry"]) for f in json.load(open("data/cube/strict_pa.geojson"))["features"]]
 fig, ax = plt.subplots(1, 3, figsize=(16, 5.8), sharey=True)

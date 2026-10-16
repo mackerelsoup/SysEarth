@@ -47,6 +47,8 @@ def main():
     ap.add_argument("--n", type=int, default=600, help="random plots")
     ap.add_argument("--n-loss", type=int, default=150, help="plots centred on post-2020 loss")
     ap.add_argument("--n-pa", type=int, default=150, help="plots on PA boundaries (if --pa)")
+    ap.add_argument("--cube", help="built cube; enables --n-defor plots on EUDR-deforested pixels")
+    ap.add_argument("--n-defor", type=int, default=150, help="plots centred on EUDR-deforested pixels (needs --cube)")
     ap.add_argument("--seed", type=int, default=2020)
     ap.add_argument("--out", default="tests/data/synthetic_plots.geojson")
     a = ap.parse_args()
@@ -97,6 +99,20 @@ def main():
             # offset +-150 m across the boundary: mixes overlaps, touches and near-misses
             off = rng.normal(0, 150) / M_PER_DEG
             add(blob(rng, pt.x + off, pt.y + rng.normal(0, 150) / M_PER_DEG, size()), "pa_boundary")
+
+    # plots centred on pixels deforested under the EUDR rule (forest 2020 in the
+    # baseline, lost after 2020). Drawn last so the groups above stay identical.
+    if a.cube and a.n_defor:
+        import sys
+        from pathlib import Path
+        sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+        from eudr.rules import EUDR
+        with rasterio.open(a.cube) as s:
+            rr, cc = np.nonzero(EUDR.deforested(s.read(1)))
+        n = min(a.n_defor, len(rr))
+        for i in rng.choice(len(rr), n, replace=False):
+            lon, lat = rasterio.transform.xy(T, rr[i], cc[i])
+            add(blob(rng, lon + rng.normal(0, 1e-4), lat + rng.normal(0, 1e-4), size()), "eudr_deforested")
 
     json.dump({"type": "FeatureCollection", "features": feats}, open(a.out, "w"))
     kinds = {}
