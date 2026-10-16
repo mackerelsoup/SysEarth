@@ -1,0 +1,13 @@
+{
+  "crs": "EPSG:4326",
+  "west": 98.72693912116041,
+  "south": 8.309329381927553,
+  "east": 99.12578187883959,
+  "north": 8.703737618072447,
+  "buffer_km": 5.0,
+  "square": true,
+  "source_geojson": ".\\tests\\data\\17plots-valid.geojson",
+  "files": [
+    "JRC_GFC2020_V4_N10_E90_clip.tif"
+  ]
+}
