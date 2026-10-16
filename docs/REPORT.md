@@ -9,10 +9,10 @@ queried quickly, while preserving every plot-level compliance decision?
 |---|---|---|---|
 | Storage (needed layers) | 3.53 MB, 6 rasters + 2 vector files | **1.17 MB** (1.13 MB raster + 7 KB overview + 36 KB vectors), **3.0× smaller** | **0.19 MB, 18.5× smaller** |
 | Uncompressed | 17.6 MB | 5.0 MB | 2.5 MB |
-| Decision fidelity, 1,093 plots × 4 regimes (`c2`, `d1`, `d2` all match) | reference | **100 %** | 100 % (EUDR only) |
+| Decision fidelity, 1,093 plots × 5 regimes (`c2`, `d1`, `d2` all match) | reference | **100 %** | 100 % (EUDR only) |
 | Pixel fidelity | reference | 100 % on every field used in decisions; canopy % mean abs. error 10.3 pts | EUDR flags only |
 | HTTP query, 17 real plots, 40 ms latency | 45 requests, 885 KB, **58.7 ms / plot** | with overview: 8 requests, 138 KB, **5.6 ms / plot** (10.5×) | – |
-| Regimes answerable | one script per regime | any cut-off year, canopy ∈ {0,10,15,20,25,30,50} %, baseline / height / plantation on or off | EUDR only |
+| Regimes answerable | one script per regime | any cut-off year, canopy ∈ {0,10,15,20,25,30,50} %, baseline / height / plantation on or off, minimum cleared-patch size | EUDR only |
 
 **The 2020 forest baseline is the EU's own map, JRC GFC2020 V4.** It matters far more than
 anything in the encoding. In this plantation landscape it removes almost all false alarms:
@@ -107,6 +107,16 @@ It is deforested when it is forest at the cut-off and lost after it, up to `loss
 
 A plot gets a `c2` indication when at least `min_px` of its pixels are deforested.
 
+**Optional minimum patch size (`min_patch_px`).** EUDR sets no minimum size for a clearing, so the
+default counts every deforested pixel. A stricter reading counts only 8-connected deforested patches
+of at least `min_patch_px` pixels. The `eudr_patch05ha` regime uses 7 px, which is 0.5 ha at this
+latitude (a Hansen pixel is ~0.077 ha). A patch is sized over its full extent, not only the part
+inside the plot, so a clearing that straddles the plot boundary counts at full size. Both query
+paths pad the read window by `min_patch_px` pixels. Any patch that touches the plot and still
+reaches the edge of that window therefore already has `min_patch_px` pixels, so sizing from the
+window is exact: it gives the same counts as labelling the whole landscape (checked on all 1,093
+plots). The cube needs no new data; the patch filter runs on the decoded window.
+
 **Ancillary layers must not post-date the cut-off they are used for.** A 2024 plantation map would
 remove forest converted to palm in 2022 from the forest mask, which hides exactly the EUDR violation.
 For that reason the RSPO-2005 regime switches off the 2020 baseline and the 2015 plantation mask
@@ -136,7 +146,7 @@ landscape (46 % of pixels lost at some point, 74 % plantation) the overview answ
 | File | Role |
 |---|---|
 | `eudr/encoding.py` | bit layout, `encode`, field accessors, decision byte, block overview |
-| `eudr/rules.py` | `Rule` dataclass; regimes EUDR, EUDR-Hansen-only, legacy, RSPO |
+| `eudr/rules.py` | `Rule` dataclass; regimes EUDR, EUDR ≥ 0.5 ha patches, EUDR-Hansen-only, legacy, RSPO; `large_patches` |
 | `eudr/query.py` | `OriginalLayers` (raw rasters + exact vectors), `CubeLayers` (cube + overview + vector refinement), shared `plot_mask` |
 | `eudr/config.json` | layer paths and class codes |
 | `scripts/build_cube.py` | builds `data/cube/{cube,overview,decision_eudr}.tif` and PA vectors (≈2 s) |
@@ -195,17 +205,20 @@ Collapsing pre-2020 loss into the epochs that bound the supported cut-offs (≤ 
 
 | Regime | Original layers | Cube | Cube + overview |
 |---|---|---|---|
-| EUDR | 1.22 ms | 0.97 ms | **0.23 ms** |
-| Legacy | 0.89 ms | 0.89 ms | 0.82 ms |
+| EUDR | 1.19 ms | 0.84 ms | **0.21 ms** |
+| EUDR, ≥ 0.5 ha patches | 1.24 ms | 1.06 ms | 0.82 ms |
+| Legacy | 0.87 ms | 0.79 ms | 0.80 ms |
 
 Without the overview both paths are bound by polygon rasterisation, not I/O. Under EUDR the
-overview skips that work for 54 % of plots.
+overview skips that work for 54 % of plots. The patch regime reads a window padded by 7 px, so the
+overview answers fewer plots (538, 49 %) and the median plot needs the full read.
 
 **COG tile requests across the 1,093 plots:**
 
 | Regime | Original layers | Cube | Cube + overview |
 |---|---|---|---|
 | EUDR | 6,005 (5 files) | 1,201 | **557** |
+| EUDR, ≥ 0.5 ha patches (7 px pad) | 6,420 (5 files) | 1,284 | 647 |
 | EUDR, Hansen only / RSPO | 3,603 (3 files) | 1,201 | 1,181 / 1,200 |
 | Legacy | 2,402 (2 files) | 1,201 | 1,181 |
 
@@ -217,11 +230,15 @@ overview skips that work for 54 % of plots.
 | Cube | 10 | 377 KB | 19.8 ms | 3.0× |
 | **Cube + overview** | **8** | **138 KB** | **5.6 ms** | **10.5×** |
 
+The ≥ 0.5 ha patch regime gives the same request counts on these 17 plots: 58.0 → 19.2 → 5.4 ms per plot
+(`data/cube/http_bench_17plots_patch05ha.json`).
+
 ### 4.3 Decision fidelity
 
 | Regime | Plots | All of `c2`, `d1`, `d2` match | Deforested pixel count matches | Positives `c2` / `d1` / `d2` |
 |---|---|---|---|---|
 | EUDR (JRC baseline + plantation mask) | 1,093 | **100 %** | 100 % | 82 / 103 / 186 |
+| EUDR, only patches ≥ 0.5 ha (7 px) | 1,093 | **100 %** | 100 % | 39 / 103 / 186 |
 | EUDR, Hansen only | 1,093 | **100 %** | 100 % | 632 / 103 / 186 |
 | Legacy (any loss 2021–23) | 1,093 | **100 %** | 100 % | 459 / 103 / 186 |
 | RSPO-style 2005, canopy > 30 % | 1,093 | **100 %** | 100 % | 913 / 103 / 186 |
@@ -234,7 +251,7 @@ Fidelity is 100 % by construction:
 - the overview is a monotone over-approximation, so it can only skip plots that are guaranteed negative.
 
 **Against the existing CSV (17 plots).** The CSV is a different, undocumented process, so this is not a fidelity
-measure. `c2` agrees on 11 of 17 plots under EUDR (9 under legacy). Under EUDR, the five plots the CSV
+measure. `c2` agrees on 11 of 17 plots under EUDR (12 with ≥ 0.5 ha patches, 9 under legacy). Under EUDR, the five plots the CSV
 flagged (all cleared on site) are clean, and the only indication is P-0001 with a single pixel (~0.08 ha). `d1` disagrees on P-0005 and P-0006, which overlap Khlong
 Phraya Wildlife Sanctuary in the current WDPA (Oct 2026: 32 % and 24 % of plot area) and in OSM (see 01 §1.4).
 
@@ -320,8 +337,13 @@ is small either way: a few hundred dollars a year. What the cube changes:
    forest mask, and JRC excludes them anyway. A 2019/2020 commodity map would be cleaner.
 4. **Loss ends in 2025.** GLAD/DIST alerts (UTM 47, weekly) could fill spare bits 14–15 for
    post-2025 monitoring.
-5. **The `min_px = 1` default is maximally cautious.** EUDR's 0.5 ha forest minimum suggests a
-   minimum-area or connectivity rule. With JRC the only real indication is a single pixel
-   (P-0001), so a 0.5 ha (7 px) minimum would clear all 17 plots. That is a parameter change only.
+5. **Done: optional minimum cleared-patch size.** The default (`min_px = 1`, no patch filter) stays
+   maximally cautious, because EUDR sets no minimum clearing size; its 0.5 ha applies to the forest.
+   The `eudr_patch05ha` regime counts only 8-connected cleared patches of ≥ 7 px (0.5 ha), sized
+   exactly (§2.3), with 100 % fidelity. It clears P-0001, the only real plot flagged under EUDR
+   (a single isolated pixel), and lowers `c2` positives from 82 to 39 of 1,093. Of the 680 EUDR
+   deforested pixels in the clip, 53 % lie in the 25 patches ≥ 0.5 ha (the largest is 49 px, ~3.8 ha);
+   the rest are 169 smaller fragments. Of the 88 plots centred on an EUDR-deforested pixel, only 38
+   stay flagged. Whether to apply a patch minimum is a policy decision for the user.
 6. **Open with the user:** the commodity in scope and how the CSV's `c2` was produced are still
    unconfirmed.

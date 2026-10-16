@@ -1,6 +1,6 @@
 # SysEarth handoff: EUDR geospatial compression challenge
 
-Current state as of 2026-10-16 (JRC GFC2020 V4 baseline in). Branch: `claude/gracious-goldberg-68rm95`
+Current state as of 2026-10-16 (JRC GFC2020 V4 baseline in; optional ≥ 0.5 ha patch rule added). Branch: `claude/gracious-goldberg-68rm95`
 (repo `mackerelsoup/SysEarth`), last commit: see `git log`. No PR open; do not open one unless asked.
 
 **Start here:** the main deliverable is `docs/REPORT.md`. The regulation-based layer analysis is
@@ -28,6 +28,7 @@ query-efficient form while preserving plot-level compliance decisions.
 - **Comparison baseline:** Cloud-Optimized GeoTIFF (COG) reads, including an HTTP range-request benchmark with simulated object-storage latency.
 - **Regimes, all parameters only:**
   - `eudr`: baseline and plantation mask on.
+  - `eudr_patch05ha`: as `eudr`, but only 8-connected cleared patches of ≥ 7 px (0.5 ha) count (`min_patch_px=7`). The read window is padded by `min_patch_px`, which makes patch sizing exact (same counts as labelling the whole landscape). Optional: EUDR sets no minimum clearing size, so `eudr` stays the default.
   - `eudr_hansen_only`: Hansen data only.
   - `legacy`: any loss 2021–2023, the rule the CSV claims to use.
   - `rspo`: cut-off 2005, canopy >30%, baseline and plantation mask off.
@@ -85,7 +86,7 @@ Alongside the cube:
 3. **Real plots under EUDR.**
    - Only P-0001 is flagged, with 1 pixel (~0.08 ha). With GLAD it was P-0001 (10 px), P-0014 (2 px) and P-0016 (1 px).
    - The five plots flagged in the CSV (P-0003, P-0005, P-0008, P-0010, P-0013), all cleared on site, are clean. CSV `c2` agreement is 11 of 17.
-   - `min_px=1` is maximally cautious; a 0.5 ha (7 px) minimum would clear all 17 plots.
+   - `min_px=1` is maximally cautious. `eudr_patch05ha` clears all 17 plots and lowers `c2` positives from 82 to 39 of 1,093. 53% of the 680 EUDR-deforested pixels are in the 25 patches ≥ 0.5 ha (the largest is 49 px); only 38 of the 88 `eudr_deforested` plots stay flagged.
    - Sensitivity: counting any JRC sub-pixel as forest gives 86 `c2` plots, 0.038% deforested, still only P-0001 (1 px).
 4. **P-0005 and P-0006 overlap Khlong Phraya Wildlife Sanctuary (IUCN Ia)**, but the CSV says `d1 = no overlap`.
 
@@ -100,7 +101,7 @@ Alongside the cube:
 
 | Measure | Result |
 |---|---|
-| Decision fidelity | **100%** of 1,093 plots in all 4 regimes, with and without the overview (`c2` / `d1` / `d2` positives under EUDR: 82 / 103 / 186; Hansen only 632, legacy 459, RSPO 913 `c2`) |
+| Decision fidelity | **100%** of 1,093 plots in all 5 regimes, with and without the overview (`c2` / `d1` / `d2` positives under EUDR: 82 / 103 / 186; ≥ 0.5 ha patches 39, Hansen only 632, legacy 459, RSPO 913 `c2`) |
 | Storage | 3.53 MB originals vs **1.17 MB** cube + overview + vectors (**3.0×**); decision byte + vectors 0.19 MB (**18.5×**). Down from 3.6× because the JRC layer is tiny (48 KB vs 1.16 MB for GLCLU) |
 | Pixel fidelity | 100% on every field used by a rule (forest 2020 exact vs aligned JRC); canopy % MAE 10.3 pts (not used); PA bit misses 0 px and has 1.6% extra boundary pixels |
 | COG tile requests (EUDR, 1,093 plots) | 6,005 → 1,201 (cube) → 557 (cube + overview) |
@@ -115,7 +116,7 @@ Alongside the cube:
 The venv is ephemeral and must be recreated each session:
 
 ```bash
-python3 -m venv /tmp/venv && /tmp/venv/bin/pip install rasterio shapely pyproj numpy matplotlib pyarrow pyogrio geopandas
+python3 -m venv /tmp/venv && /tmp/venv/bin/pip install rasterio shapely pyproj numpy scipy matplotlib pyarrow pyogrio geopandas
 PY=/tmp/venv/bin/python
 $PY scripts/fetch_layers.py          # GLAD (GCS) + ESA (S3) + Overture (S3), about 1 min
 $PY scripts/fetch_wdpa.py --gdb <WDPA_WDOECM_Oct2026_Public_THA.gdb> --out data/layers/wdpa_oct2026_aoi.geojson   # or --work DIR to download the 2016 archive
@@ -124,6 +125,7 @@ $PY scripts/build_cube.py            # -> data/cube/
 $PY scripts/make_synthetic_plots.py --pa data/layers/wdpa_oct2026_aoi.geojson tests/data/synthetic_restricted_areas.geojson --n-pa 250 --cube data/cube/cube.tif --n-defor 150
 $PY scripts/evaluate.py --plots tests/data/17plots-valid.geojson tests/data/synthetic_plots.geojson
 $PY scripts/bench_http.py --plots tests/data/17plots-valid.geojson --latency-ms 40 --out data/cube/http_bench_17plots.json
+$PY scripts/bench_http.py --plots tests/data/17plots-valid.geojson --latency-ms 40 --regime eudr_patch05ha --out data/cube/http_bench_17plots_patch05ha.json
 $PY scripts/plot_rules.py            # docs/img/rules_compared.png
 ```
 
@@ -132,7 +134,7 @@ $PY scripts/plot_rules.py            # docs/img/rules_compared.png
 | File | Contents |
 |---|---|
 | `eudr/encoding.py` | bit layout, encode, overview, decision byte |
-| `eudr/rules.py` | `Rule` dataclass and `REGIMES` |
+| `eudr/rules.py` | `Rule` dataclass, `REGIMES`, `large_patches` (patch-size filter), `Rule.count_deforested` / `window_pad` |
 | `eudr/query.py` | `OriginalLayers`, `CubeLayers`, `VectorIndex`, shared `plot_mask` |
 | `scripts/clip_rasters.py` | original Hansen clipper (also used for the JRC tile) |
 | `scripts/align_to_hansen.py` | aggregates a finer raster to % of given classes per Hansen pixel |
@@ -150,7 +152,7 @@ $PY scripts/plot_rules.py            # docs/img/rules_compared.png
 ## 9. Open items / next steps
 1. Done: JRC GFC2020 V4 is the bit 8 baseline. WDPA is current (Oct 2026); only the DNP boundary could still change the P-0005/P-0006 result.
 2. Add real restricted-use areas, e.g. Thai Royal Forest Department National Reserved Forests (not in WDPA).
-3. Add a minimum-area (0.5 ha) or connectivity option for `c2`. With JRC, a 7 px minimum clears all 17 real plots.
+3. Done: optional minimum cleared-patch size (`min_patch_px`, regime `eudr_patch05ha`). Whether to use it is a policy call for the user.
 4. Add GLAD/DIST alerts in spare bits 14–15 for monitoring after 2025.
 5. Use a 2019/2020 plantation map if one becomes available.
 6. Confirm with the user the commodity in scope and how the CSV's `c2` was produced.

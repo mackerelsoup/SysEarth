@@ -27,7 +27,7 @@ Of the 35 columns in `tests/data/17plots-valid.csv`, only three are reproducible
 
 | Column | Output | Spatial rule |
 |---|---|---|
-| `c2_deforestation_spatial_analysis_result` | indication yes/no | ≥ `min_px` pixels in the plot that are forest at 2020 **and** lost in 2021+ |
+| `c2_deforestation_spatial_analysis_result` | indication yes/no | ≥ `min_px` pixels in the plot that are forest at 2020 **and** lost in 2021+ (optionally only those in cleared patches of ≥ `min_patch_px`) |
 | `d1_strict_protected_area_spatial_analysis_result` | overlap yes/no | plot polygon ∩ strict PA polygon has area > 0 |
 | `d2_restricted_use_area_spatial_analysis_result` | overlap yes/no | plot polygon ∩ restricted-use polygon has area > 0 |
 
@@ -85,7 +85,7 @@ The official EU baseline therefore removes almost all false alarms in this lands
 
 All five plots flagged in the CSV (and later cleared on site) are clean under the full EUDR rule,
 matching the field verification. The only remaining indication is a single pixel in P-0001
-(~0.08 ha); a 0.5 ha (7 px) minimum-area parameter would clear it. Counting any JRC sub-pixel
+(~0.08 ha); the optional ≥ 0.5 ha (7 px) cleared-patch regime `eudr_patch05ha` clears it (REPORT §2.3). Counting any JRC sub-pixel
 as forest instead of the majority changes little: 86 plots with `c2`, 0.038 % deforested, and
 still only P-0001 (1 px).
 

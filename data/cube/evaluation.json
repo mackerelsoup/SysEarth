@@ -89,6 +89,57 @@
     }
    }
   },
+  "eudr_patch05ha": {
+   "cube": {
+    "plots": 1093,
+    "all_outputs_match_pct": 100.0,
+    "deforested_px_match_pct": 100.0,
+    "mismatches": []
+   },
+   "cube+overview": {
+    "plots": 1093,
+    "all_outputs_match_pct": 100.0,
+    "deforested_px_match_pct": 100.0,
+    "mismatches": []
+   },
+   "positives_original": {
+    "c2_indication": 39,
+    "d1_strict_pa": 103,
+    "d2_restricted": 186
+   },
+   "positives_by_kind": {
+    "real": {
+     "n": 17,
+     "c2_indication": 0,
+     "d1_strict_pa": 2,
+     "d2_restricted": 0
+    },
+    "random": {
+     "n": 600,
+     "c2_indication": 1,
+     "d1_strict_pa": 58,
+     "d2_restricted": 11
+    },
+    "post2020_loss": {
+     "n": 138,
+     "c2_indication": 0,
+     "d1_strict_pa": 8,
+     "d2_restricted": 2
+    },
+    "pa_boundary": {
+     "n": 250,
+     "c2_indication": 0,
+     "d1_strict_pa": 25,
+     "d2_restricted": 169
+    },
+    "eudr_deforested": {
+     "n": 88,
+     "c2_indication": 38,
+     "d1_strict_pa": 10,
+     "d2_restricted": 4
+    }
+   }
+  },
   "eudr_hansen_only": {
    "cube": {
     "plots": 1093,
@@ -246,24 +297,24 @@
  "query": {
   "eudr": {
    "original": {
-    "median_ms_per_plot": 1.219,
-    "mean_ms_per_plot": 1.261,
+    "median_ms_per_plot": 1.194,
+    "mean_ms_per_plot": 1.231,
     "window_reads": 5465,
     "pixels_decoded": 1291270,
     "plots_answered_from_overview": 0,
     "cog_range_requests": 6005
    },
    "cube": {
-    "median_ms_per_plot": 0.967,
-    "mean_ms_per_plot": 1.121,
+    "median_ms_per_plot": 0.839,
+    "mean_ms_per_plot": 0.953,
     "window_reads": 1093,
     "pixels_decoded": 258254,
     "plots_answered_from_overview": 0,
     "cog_range_requests": 1201
    },
    "cube+overview": {
-    "median_ms_per_plot": 0.227,
-    "mean_ms_per_plot": 0.796,
+    "median_ms_per_plot": 0.205,
+    "mean_ms_per_plot": 0.709,
     "window_reads": 507,
     "pixels_decoded": 123407,
     "plots_answered_from_overview": 586,
@@ -271,26 +322,53 @@
    },
    "files_per_query_original": 5
   },
+  "eudr_patch05ha": {
+   "original": {
+    "median_ms_per_plot": 1.241,
+    "mean_ms_per_plot": 1.272,
+    "window_reads": 5465,
+    "pixels_decoded": 3896770,
+    "plots_answered_from_overview": 0,
+    "cog_range_requests": 6420
+   },
+   "cube": {
+    "median_ms_per_plot": 1.06,
+    "mean_ms_per_plot": 1.254,
+    "window_reads": 1093,
+    "pixels_decoded": 779354,
+    "plots_answered_from_overview": 0,
+    "cog_range_requests": 1284
+   },
+   "cube+overview": {
+    "median_ms_per_plot": 0.824,
+    "mean_ms_per_plot": 0.832,
+    "window_reads": 555,
+    "pixels_decoded": 398565,
+    "plots_answered_from_overview": 538,
+    "cog_range_requests": 647
+   },
+   "files_per_query_original": 5
+  },
   "eudr_hansen_only": {
    "original": {
     "median_ms_per_plot": 0.998,
-    "mean_ms_per_plot": 1.037,
+    "mean_ms_per_plot": 1.057,
     "window_reads": 3279,
     "pixels_decoded": 774762,
     "plots_answered_from_overview": 0,
     "cog_range_requests": 3603
    },
    "cube": {
-    "median_ms_per_plot": 0.823,
-    "mean_ms_per_plot": 1.003,
+    "median_ms_per_plot": 0.858,
+    "mean_ms_per_plot": 1.02,
     "window_reads": 1093,
     "pixels_decoded": 258254,
     "plots_answered_from_overview": 0,
     "cog_range_requests": 1201
    },
    "cube+overview": {
-    "median_ms_per_plot": 0.874,
-    "mean_ms_per_plot": 1.044,
+    "median_ms_per_plot": 1.083,
+    "mean_ms_per_plot": 1.16,
     "window_reads": 1073,
     "pixels_decoded": 256271,
     "plots_answered_from_overview": 20,
@@ -300,24 +378,24 @@
   },
   "legacy": {
    "original": {
-    "median_ms_per_plot": 0.889,
-    "mean_ms_per_plot": 0.903,
+    "median_ms_per_plot": 0.872,
+    "mean_ms_per_plot": 0.888,
     "window_reads": 2186,
     "pixels_decoded": 516508,
     "plots_answered_from_overview": 0,
     "cog_range_requests": 2402
    },
    "cube": {
-    "median_ms_per_plot": 0.887,
-    "mean_ms_per_plot": 1.011,
+    "median_ms_per_plot": 0.79,
+    "mean_ms_per_plot": 0.913,
     "window_reads": 1093,
     "pixels_decoded": 258254,
     "plots_answered_from_overview": 0,
     "cog_range_requests": 1201
    },
    "cube+overview": {
-    "median_ms_per_plot": 0.816,
-    "mean_ms_per_plot": 0.973,
+    "median_ms_per_plot": 0.802,
+    "mean_ms_per_plot": 1.007,
     "window_reads": 1073,
     "pixels_decoded": 256271,
     "plots_answered_from_overview": 20,
@@ -327,24 +405,24 @@
   },
   "rspo": {
    "original": {
-    "median_ms_per_plot": 0.992,
-    "mean_ms_per_plot": 1.008,
+    "median_ms_per_plot": 1.283,
+    "mean_ms_per_plot": 1.244,
     "window_reads": 3279,
     "pixels_decoded": 774762,
     "plots_answered_from_overview": 0,
     "cog_range_requests": 3603
    },
    "cube": {
-    "median_ms_per_plot": 0.906,
-    "mean_ms_per_plot": 1.029,
+    "median_ms_per_plot": 0.899,
+    "mean_ms_per_plot": 1.005,
     "window_reads": 1093,
     "pixels_decoded": 258254,
     "plots_answered_from_overview": 0,
     "cog_range_requests": 1201
    },
    "cube+overview": {
-    "median_ms_per_plot": 0.842,
-    "mean_ms_per_plot": 1.005,
+    "median_ms_per_plot": 1.036,
+    "mean_ms_per_plot": 1.196,
     "window_reads": 1092,
     "pixels_decoded": 258212,
     "plots_answered_from_overview": 1,
@@ -363,6 +441,114 @@
      "csv_flag": false,
      "ours": true,
      "def_px": 1
+    },
+    {
+     "plot": "P-0003",
+     "csv_flag": true,
+     "ours": false,
+     "def_px": 0
+    },
+    {
+     "plot": "P-0004",
+     "csv_flag": false,
+     "ours": false,
+     "def_px": 0
+    },
+    {
+     "plot": "P-0005",
+     "csv_flag": true,
+     "ours": false,
+     "def_px": 0
+    },
+    {
+     "plot": "P-0006",
+     "csv_flag": false,
+     "ours": false,
+     "def_px": 0
+    },
+    {
+     "plot": "P-0008",
+     "csv_flag": true,
+     "ours": false,
+     "def_px": 0
+    },
+    {
+     "plot": "P-0009",
+     "csv_flag": false,
+     "ours": false,
+     "def_px": 0
+    },
+    {
+     "plot": "P-0010",
+     "csv_flag": true,
+     "ours": false,
+     "def_px": 0
+    },
+    {
+     "plot": "P-0011",
+     "csv_flag": false,
+     "ours": false,
+     "def_px": 0
+    },
+    {
+     "plot": "P-0013",
+     "csv_flag": true,
+     "ours": false,
+     "def_px": 0
+    },
+    {
+     "plot": "P-0014",
+     "csv_flag": false,
+     "ours": false,
+     "def_px": 0
+    },
+    {
+     "plot": "P-0015",
+     "csv_flag": false,
+     "ours": false,
+     "def_px": 0
+    },
+    {
+     "plot": "P-0016",
+     "csv_flag": false,
+     "ours": false,
+     "def_px": 0
+    },
+    {
+     "plot": "P-0017",
+     "csv_flag": false,
+     "ours": false,
+     "def_px": 0
+    },
+    {
+     "plot": "P-0018",
+     "csv_flag": false,
+     "ours": false,
+     "def_px": 0
+    },
+    {
+     "plot": "P-0019",
+     "csv_flag": false,
+     "ours": false,
+     "def_px": 0
+    },
+    {
+     "plot": "P-0020",
+     "csv_flag": false,
+     "ours": false,
+     "def_px": 0
+    }
+   ]
+  },
+  "eudr_patch05ha": {
+   "c2_agree": 12,
+   "of": 17,
+   "rows": [
+    {
+     "plot": "P-0001",
+     "csv_flag": false,
+     "ours": false,
+     "def_px": 0
     },
     {
      "plot": "P-0003",

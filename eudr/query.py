@@ -95,24 +95,25 @@ class OriginalLayers:
     def query(self, rule, geom):
         t0 = time.perf_counter()
         ref = self.src["lossyear"]
-        win = plot_window(ref, geom)
+        win = plot_window(ref, geom, rule.window_pad)
         m = plot_mask(geom, win, ref.transform, rule.pixel_rule)
-        ly = self._read("lossyear", win)[m]
-        land = self._read("datamask", win)[m] == 1
+        # rule evaluated on the whole window (patch sizes need the neighbourhood), then masked
+        ly = self._read("lossyear", win)
+        land = self._read("datamask", win) == 1
         after = (ly >= rule.loss_lo) & (ly <= rule.loss_hi)
         if rule.require_forest:
-            tc = self._read("treecover2000", win)[m]
+            tc = self._read("treecover2000", win)
             forest = (tc > rule.canopy_threshold) & ((ly == 0) | (ly >= rule.loss_lo)) & land
             # a layer the deployment lacks behaves like an all-zero flag, as in the cube
             if rule.use_baseline:
-                forest &= ("forest2020" in self.src) and np.isin(self._read("forest2020", win)[m], self.forest_values)
+                forest &= ("forest2020" in self.src) and np.isin(self._read("forest2020", win), self.forest_values)
             if rule.use_height:
-                forest &= ("height" in self.src) and self._read("height", win)[m] >= 5
+                forest &= ("height" in self.src) and self._read("height", win) >= 5
             if rule.exclude_plantation and "plantation" in self.src:
-                forest &= ~np.isin(self._read("plantation", win)[m], self.plant_values)
+                forest &= ~np.isin(self._read("plantation", win), self.plant_values)
         else:
             forest = land
-        n_def = int((forest & after).sum())
+        n_def = rule.count_deforested(forest & after, m)
         out = {
             "n_px": int(m.sum()),
             "deforested_px": n_def,
@@ -144,7 +145,7 @@ class CubeLayers:
 
     def query(self, rule, geom):
         t0 = time.perf_counter()
-        win = plot_window(self.src, geom)
+        win = plot_window(self.src, geom, rule.window_pad)
         if self.ov is not None:
             b = self.block
             r0, c0 = int(win.row_off) // b, int(win.col_off) // b
@@ -160,8 +161,7 @@ class CubeLayers:
         cube = self.src.read(1, window=win)
         self.stats.reads += 1
         self.stats.px_read += cube.size
-        px = cube[m]
-        n_def = int(rule.deforested(px).sum())
+        n_def = rule.count_deforested(rule.deforested(cube), m)
         # raster PA bits are burned all_touched, so a miss is a guaranteed miss;
         # a hit is confirmed against the vector (exact) unless refine_pa is off.
         hit_s = hit_r = False

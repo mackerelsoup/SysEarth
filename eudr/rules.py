@@ -2,15 +2,37 @@
 
 A regime is a Rule: the cut-off year, the canopy threshold that makes a pixel
 'forest', which extra evidence the forest mask needs, and how many deforested
-pixels trigger an indication. Switching regime (EUDR 2020, RSPO 2005, the
+pixels trigger an indication (optionally counting only cleared patches of a
+minimum size). Switching regime (EUDR 2020, RSPO 2005, the
 legacy 'any Hansen loss 2021-2023' check) changes only these numbers, never
 the stored data.
 """
 from dataclasses import dataclass, replace
 
 import numpy as np
+from scipy import ndimage
 
 from . import encoding as E
+
+_EIGHT = np.ones((3, 3), dtype=bool)
+
+
+def large_patches(mask, min_px):
+    """Keep the 8-connected patches of a 2-D mask with at least min_px pixels.
+
+    A patch touching the window edge may continue outside it, so it is kept
+    whatever its size: the filter can over-count but never drops a patch that
+    is large in the full landscape.
+    """
+    lab, n = ndimage.label(mask, structure=_EIGHT)
+    if n == 0:
+        return mask
+    sizes = np.bincount(lab.ravel(), minlength=n + 1)
+    keep = sizes >= min_px
+    edge = np.unique(np.concatenate([lab[0], lab[-1], lab[:, 0], lab[:, -1]]))
+    keep[edge] = True
+    keep[0] = False
+    return keep[lab]
 
 
 @dataclass(frozen=True)
@@ -24,6 +46,7 @@ class Rule:
     exclude_plantation: bool = True  # tree-crop plantations are not forest
     require_forest: bool = True      # False -> any loss counts (legacy rule)
     min_px: int = 1                  # deforested pixels needed for an indication
+    min_patch_px: int = 0            # >0: only 8-connected cleared patches this big count
     pixel_rule: str = "centre"       # 'centre' or 'all_touched'
 
     # loss codes are years minus 2000
@@ -58,6 +81,22 @@ class Rule:
     def deforested(self, cube):
         return self.forest_mask(cube) & self.lost_after_cutoff(cube)
 
+    @property
+    def window_pad(self):
+        # a patch that touches the plot and reaches min_patch_px beyond its bbox
+        # already has min_patch_px pixels, so this pad makes patch sizing exact
+        return max(1, self.min_patch_px)
+
+    def count_deforested(self, defor, in_plot):
+        """Deforested pixels inside the plot, from a 2-D mask over the read window.
+
+        With min_patch_px, a patch is sized over the whole window, so a clearing
+        that straddles the plot boundary counts at its full size.
+        """
+        if self.min_patch_px > 0:
+            defor = large_patches(defor, self.min_patch_px)
+        return int((defor & in_plot).sum())
+
     # ---- conservative test on the block overview (no false negatives) ----
     def overview_maybe_deforested(self, ov):
         m = E.lossyear(ov) >= self.loss_lo        # block max loss year
@@ -81,16 +120,8 @@ LEGACY = Rule("Legacy report rule (any Hansen loss 2021-2023)", loss_end_year=20
 RSPO = replace(EUDR, name="RSPO-style (cut-off Nov 2005 -> loss from 2006, canopy > 30%)",
                cutoff_year=2005, canopy_threshold=30, use_baseline=False, exclude_plantation=False)
 
-REGIMES = {"eudr": EUDR, "eudr_hansen_only": EUDR_HANSEN_ONLY, "legacy": LEGACY, "rspo": RSPO}
+# A Hansen pixel (0.00025 deg) is ~0.077 ha at 8.5 N, so 0.5 ha is 7 pixels.
+EUDR_PATCH_05HA = replace(EUDR, name="EUDR, only cleared patches >= 0.5 ha (7 px) count", min_patch_px=7)
 
-
-def plot_decision(rule, cube_px, strict_hit, restricted_hit):
-    """Plot-level outputs from the cube pixels inside the plot."""
-    n_def = int(rule.deforested(cube_px).sum())
-    return {
-        "n_px": int(cube_px.size),
-        "deforested_px": n_def,
-        "c2_indication": n_def >= rule.min_px,
-        "d1_strict_pa": bool(strict_hit),
-        "d2_restricted": bool(restricted_hit),
-    }
+REGIMES = {"eudr": EUDR, "eudr_patch05ha": EUDR_PATCH_05HA, "eudr_hansen_only": EUDR_HANSEN_ONLY,
+           "legacy": LEGACY, "rspo": RSPO}

@@ -148,7 +148,7 @@ def main():
         n = len(plots)
         nfiles = len(files_needed(rule, cfg))
         with rasterio.open(cd / "cube.tif") as s:
-            tiles = [tiles_touched(plot_window(s, g)) for _, _, g in plots]
+            tiles = [tiles_touched(plot_window(s, g, rule.window_pad)) for _, _, g in plots]
         skipped = runs["cube+overview"][0]["skipped"]
         q = {}
         for name in runs:

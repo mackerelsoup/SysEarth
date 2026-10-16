@@ -1,0 +1,29 @@
+{
+ "latency_ms": 40.0,
+ "plots": 17,
+ "regime": "eudr_patch05ha",
+ "original": {
+  "open_requests": 23,
+  "open_s": 0.996,
+  "query_requests": 22,
+  "bytes": 885212,
+  "total_s": 1.982,
+  "ms_per_plot": 58.02
+ },
+ "cube": {
+  "open_requests": 3,
+  "open_s": 0.129,
+  "query_requests": 7,
+  "bytes": 376832,
+  "total_s": 0.456,
+  "ms_per_plot": 19.24
+ },
+ "cube+overview": {
+  "open_requests": 6,
+  "open_s": 0.257,
+  "query_requests": 2,
+  "bytes": 138244,
+  "total_s": 0.35,
+  "ms_per_plot": 5.44
+ }
+}
