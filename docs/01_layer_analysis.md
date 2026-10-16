@@ -57,7 +57,7 @@ Sizes are for the 1597 × 1578 px clip (2.52 M pixels at 0.00025°, about 27.5 m
 | 2020 forest baseline | GLAD GLCLU 2020 v2, classes 27–48 / 127–148 (tree cover ≥ 5 m). JRC GFC2020 is the EU reference but its host is blocked from this sandbox, and it drops in unchanged. | **Yes** | **Merge** into 1 bit | bit 8 | Replaces "Hansen 2000 canopy minus loss until 2020", which ignores 2000–2020 regrowth and plantations. JRC GFC2020 is the EU's reference map. |
 | Tree height ≥ 5 m (2020) | GLAD TCH 2020 (canopy height in metres) | Yes (forest definition) | **Merge** into 1 bit | bit 9 | The 5 m criterion. Optional in the default rule because the baseline already applies it. |
 | Tree-crop plantation | GLAD Commodities **2015**, class 2 (other plantation, incl. rubber) + class 4 (oil palm) | **Yes** | **Merge** into 1 bit | bit 10 | "Agricultural use" is excluded from forest. **Must be a pre-2020 map**: a post-2020 plantation map would hide exactly the forest-to-plantation conversion EUDR targets. |
-| Strict protected areas | **WDPA March 2016** (UNEP-WCMC archive; the live Protected Planet download is blocked here): Khlong Phraya WS (Ia, 1980), Khao Phanom Bencha NP (II, 1981) and Than Bok Khorani Marine NP (II, 1998). All are polygons, with no point-only sites in the clip. OSM via Overture is kept as a cross-check. | **Yes** (`d1`) | **Keep as vector** + 1 conservative bit | bit 11 + GeoJSON | The decision is a polygon intersection. The bit is burned *all-touched*, so it never misses an overlap, and hits are confirmed on the vector. |
+| Strict protected areas | **WDPA/WD-OECM October 2026, Thailand** (user-supplied `.gdb`): Khlong Phraya WS (SITE_ID 4015, Ia, 1980) and Khao Phanom Bencha NP (5068, II, 1981). Both are polygons, with no point-only sites or OECMs in the clip. Than Bok Khorani Marine NP (312954) lies just west of the clip edge in this release. OSM via Overture is kept as a cross-check. | **Yes** (`d1`) | **Keep as vector** + 1 conservative bit | bit 11 + GeoJSON | The decision is a polygon intersection. The bit is burned *all-touched*, so it never misses an overlap, and hits are confirmed on the vector. |
 | Restricted-use areas | none mapped in OSM for the clip area → 6 **synthetic** polygons (`tests/data/synthetic_restricted_areas.geojson`) only to test the `d2` path | **Yes** (`d2`) | as above | bit 12 + GeoJSON | as above |
 | GLAD / DIST alerts | GLAD | Post-2025 monitoring | **Optional extension** | spare bits 14–15 | Annual Hansen ends at 2025. Alerts would extend the window weekly. |
 
@@ -84,14 +84,14 @@ indications are 1–10 pixels (0.08–0.8 ha), which is what a `min_px` / minimu
 **Unexpected legality finding.** P-0005 and P-0006 **overlap Khlong Phraya Wildlife Sanctuary**
 (IUCN Ia) in both boundary sources, but the CSV reports `d1 = No overlap` for both:
 
-| Plot | Area | Inside WDPA (Mar 2016) | Inside OSM (2026) |
-|---|---|---|---|
-| P-0005 | 20.07 ha | 32 % | 100 % |
-| P-0006 | 19.50 ha | 24 % | 100 % |
+| Plot | Area | Inside WDPA (Oct 2026) | Inside WDPA (Mar 2016) | Inside OSM (2026) |
+|---|---|---|---|---|
+| P-0005 | 20.07 ha | 32 % | 32 % | 100 % |
+| P-0006 | 19.50 ha | 24 % | 24 % | 100 % |
 
-The two sanctuary boundaries agree on the total area (147.9 km² vs 149.5 km², reported 153.6 km²)
+The WDPA boundary is identical in 2016 and 2026. WDPA and OSM agree on the total area (147.9 km² vs 149.5 km², reported 153.6 km²)
 but differ locally by up to 815 m (IoU 0.82). Both plots sit on the western edge, where the
 boundaries diverge. Either way, they overlap a strict protected area, so the report's `d1` is
-wrong for these two plots unless a current official boundary (DNP) shows otherwise. It is consistent with the map, though: 22 % of
+wrong for these two plots according to the current WDPA. Only the official DNP boundary could overturn that. It is consistent with the map, though: 22 % of
 strict-PA pixels are tree-crop plantation already in 2015 (encroachment), and the western edge of
 the sanctuary is where Hansen-only rules flag most loss.

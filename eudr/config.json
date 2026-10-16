@@ -70,12 +70,12 @@
   "min": 5
  },
  "strict_pa": {
-  "path": "data/layers/wdpa_mar2016_aoi.geojson",
+  "path": "data/layers/wdpa_oct2026_aoi.geojson",
   "field": "eudr_category",
   "values": [
    "strict"
   ],
-  "note": "WDPA Mar 2016 (UNEP-WCMC archive); IUCN Ia/Ib/II -> strict. OSM/Overture alternative: data/layers/protected_areas_overture.geojson"
+  "note": "WDPA/WD-OECM Oct 2026 Thailand (user-supplied .gdb, clipped by scripts/fetch_wdpa.py); IUCN Ia/Ib/II -> strict. Older: wdpa_mar2016_aoi.geojson; OSM cross-check: protected_areas_overture.geojson"
  },
  "restricted": {
   "path": "tests/data/synthetic_restricted_areas.geojson",

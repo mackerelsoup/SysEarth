@@ -33,7 +33,7 @@ import pyogrio
 
 URL = "https://wdpa.s3.eu-west-1.amazonaws.com/2016/WDPA_Mar2016_Public.zip"
 ARCHIVE_GDB = "WDPA_Mar2016_Public/WDPA_Mar2016_Public.gdb"
-COLS = ["WDPAID", "WDPA_PID", "NAME", "NAME_ENG", "ORIG_NAME", "DESIG_ENG", "IUCN_CAT", "STATUS",
+COLS = ["SITE_ID", "SITE_PID", "SITE_TYPE", "WDPAID", "WDPA_PID", "NAME", "NAME_ENG", "ORIG_NAME", "DESIG_ENG", "IUCN_CAT", "STATUS",
         "STATUS_YR", "REP_AREA", "GIS_AREA", "MARINE", "ISO3", "PA_DEF"]
 STRICT_IUCN = {"Ia", "Ib", "II"}
 M_PER_DEG = 111195.0

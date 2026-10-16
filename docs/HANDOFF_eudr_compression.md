@@ -63,12 +63,12 @@ Alongside the cube:
 | Forest 2020 | GLAD GLCLU 2020 v2 | classes 27–48 and 127–148 |
 | Plantation | GLAD Commodities **2015** | class 2 = other plantation (includes rubber), 4 = oil palm |
 | Height | GLAD TCH 2020 | ≥5 m |
-| Strict PA | **WDPA March 2016** via `scripts/fetch_wdpa.py` → `data/layers/wdpa_mar2016_aoi.geojson` | IUCN Ia/Ib/II = strict |
+| Strict PA | **WDPA/WD-OECM Oct 2026, Thailand** (user-uploaded `.gdb`, clipped with `scripts/fetch_wdpa.py --gdb`) → `data/layers/wdpa_oct2026_aoi.geojson` | IUCN Ia/Ib/II = strict. Fields renamed in 2026: `WDPAID`→`SITE_ID`. The 2016 archive copy is kept as `wdpa_mar2016_aoi.geojson` |
 | Restricted-use areas | **synthetic**, `tests/data/synthetic_restricted_areas.geojson` | 6 polygons, only to test `d2`; no real source exists in WDPA or OSM for this area |
 | Cross-check | OSM via Overture, `data/layers/protected_areas_overture.geojson` | – |
 | Unused but fetched | ESA WorldCover 2020, GLAD Commodities 2024, commodity gain, LandUse 2024, GLCLU change | – |
 
-- **WDPA in the clip area:** Khlong Phraya WS (ID 4015, Ia), Khao Phanom Bencha NP (5068, II) and Than Bok Khorani Marine NP (312954, II). All are polygons; there are no point-only sites.
+- **WDPA in the clip area (Oct 2026):** Khlong Phraya WS (4015, Ia) and Khao Phanom Bencha NP (5068, II). Both are polygons; there are no point-only sites or OECMs. Than Bok Khorani Marine NP (312954) is now just west of the clip edge (98.722° E).
 - **Test plots:** `tests/data/synthetic_plots.geojson` holds 988 plots: 600 random, 138 on post-2020 loss, 250 on PA boundaries. With the 17 real plots that makes 1,005.
 
 ## 5. Key findings
@@ -86,7 +86,7 @@ Alongside the cube:
    - `min_px=1` is maximally cautious.
 4. **P-0005 and P-0006 overlap Khlong Phraya Wildlife Sanctuary (IUCN Ia)**, but the CSV says `d1 = no overlap`.
 
-   | Plot | Inside WDPA 2016 | Inside OSM 2026 |
+   | Plot | Inside WDPA Oct 2026 (= 2016) | Inside OSM 2026 |
    |---|---|---|
    | P-0005 | 32% | 100% |
    | P-0006 | 24% | 100% |
@@ -97,9 +97,9 @@ Alongside the cube:
 
 | Measure | Result |
 |---|---|
-| Decision fidelity | **100%** of 1,005 plots in all 4 regimes, with and without the overview (`c2` / `d1` / `d2` positives under EUDR: 235 / 96 / 180) |
-| Storage | 4.66 MB originals vs **1.29 MB** cube + overview + vectors (**3.6×**); decision byte + vectors 0.29 MB (**16.1×**) |
-| Pixel fidelity | 100% on every field used by a rule; canopy % MAE 10.3 pts (not used); PA bit misses 0 px and has 1.8% extra boundary pixels |
+| Decision fidelity | **100%** of 1,005 plots in all 4 regimes, with and without the overview (`c2` / `d1` / `d2` positives under EUDR: 237 / 93 / 182) |
+| Storage | 4.64 MB originals vs **1.27 MB** cube + overview + vectors (**3.6×**); decision byte + vectors 0.27 MB (**16.9×**) |
+| Pixel fidelity | 100% on every field used by a rule; canopy % MAE 10.3 pts (not used); PA bit misses 0 px and has 1.6% extra boundary pixels |
 | COG tile requests (EUDR, 1,005 plots) | 5,495 → 1,099 |
 | HTTP query, 17 plots at 40 ms latency | 72 → 19 ms per plot; 51 → 10 requests |
 | Local-disk speed | about 1 ms per plot either way (rasterisation-bound) |
@@ -115,9 +115,9 @@ The venv is ephemeral and must be recreated each session:
 python3 -m venv /tmp/venv && /tmp/venv/bin/pip install rasterio shapely pyproj numpy matplotlib pyarrow pyogrio geopandas
 PY=/tmp/venv/bin/python
 $PY scripts/fetch_layers.py          # GLAD (GCS) + ESA (S3) + Overture (S3), about 1 min
-$PY scripts/fetch_wdpa.py --work /tmp/wdpa_dl   # 1 GB download, about 1 min; keeps only the clip
+$PY scripts/fetch_wdpa.py --gdb <WDPA_WDOECM_Oct2026_Public_THA.gdb> --out data/layers/wdpa_oct2026_aoi.geojson   # or --work DIR to download the 2016 archive
 $PY scripts/build_cube.py            # -> data/cube/
-$PY scripts/make_synthetic_plots.py --pa data/layers/wdpa_mar2016_aoi.geojson tests/data/synthetic_restricted_areas.geojson --n-pa 250
+$PY scripts/make_synthetic_plots.py --pa data/layers/wdpa_oct2026_aoi.geojson tests/data/synthetic_restricted_areas.geojson --n-pa 250
 $PY scripts/evaluate.py --plots tests/data/17plots-valid.geojson tests/data/synthetic_plots.geojson
 $PY scripts/bench_http.py --plots tests/data/17plots-valid.geojson --latency-ms 40 --out data/cube/http_bench_17plots.json
 $PY scripts/plot_rules.py            # docs/img/rules_compared.png
@@ -143,7 +143,7 @@ $PY scripts/plot_rules.py            # docs/img/rules_compared.png
 - **Context:** keep each context under about 150k tokens; spin up subagents for large chunks of work. The user has given full autonomy and wants steps and findings reported as work proceeds.
 
 ## 9. Open items / next steps
-1. Swap in JRC GFC2020 (bit 8) and a current WDPA release when they are reachable or uploaded by the user. Confirm the P-0005/P-0006 overlap against the DNP boundary.
+1. Swap in JRC GFC2020 (bit 8) when reachable or uploaded. WDPA is now current (Oct 2026); only the DNP boundary could still change the P-0005/P-0006 result.
 2. Add real restricted-use areas, e.g. Thai Royal Forest Department National Reserved Forests (not in WDPA).
 3. Add a minimum-area (0.5 ha) or connectivity option for `c2`.
 4. Add GLAD/DIST alerts in spare bits 14–15 for monitoring after 2025.
